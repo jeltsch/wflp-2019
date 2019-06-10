@@ -1,0 +1,14 @@
+chapter WFLP_2019
+
+session Paper = HOL +
+  description
+    \<open>A Process Calculus for Formally Verifying Blockchain Consensus Protocols (paper)\<close>
+  sessions
+    "HOL-Library"
+  theories
+    Content
+  document_files
+    "root.tex"
+    "root.bib"
+    "llncs.cls"
+    "splncs04.bst"
