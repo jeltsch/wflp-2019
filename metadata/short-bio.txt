@@ -1,0 +1,12 @@
+Wolfgang Jeltsch came into contact with functional programming as an
+undergraduate and has been using it extensively in research,
+development, and teaching ever since. For many years he pursued research
+on functional reactive programming (FRP), in particular about its
+efficient and type-safe implementation, its semantics, and its close
+connection to temporal logic. Currently he is working on high-assurance
+implementations of blockchain consensus protocols based on Haskell and
+Isabelle/HOL.
+
+He earned a PhD in computer science from Brandenburg University of
+Technology, Cottbus in 2012. He is part of Well-Typed, working as a
+consultant for blockchain company IOHK.
