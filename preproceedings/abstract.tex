@@ -39,18 +39,20 @@ implementation language. The $\natural$-calculus is a domain-specific
 language embedded in a functional host language using higher-order
 abstract syntax.
 
-This paper will be a ramble through the $\natural$-calculus. First we
-will look at its language and its operational semantics. The latter is
-unique in that it uses a stack of two labeled transition systems to
-treat phenomena like data transfer and the opening and closing of
-channel scope in a modular fashion. The presence of multiple transition
-systems calls for a generic treatment of derived concurrency concepts
-such as strong and weak bisimilarity. I will show you how such a
-treatment can be achieved by capturing notions like scope opening and
-silent transitions abstractly using axiomatically defined algebraic
-structures. You will, perhaps surprisingly, encounter some old friends
-of the functional programmer, namely functors and monads, albeit in a
-different guise.
+The syntax of the $\natural$-calculus is rather minimalistic. It
+comprises only five constructs: $\mathit{stop}$, $\mathit{send}$,
+$\mathit{receive}$, $\mathit{parallel}$, and
+$\mathit{new\text{-}channel}$. The operational semantics of the
+$\natural$-calculus is unique in that it uses a stack of two labeled
+transition systems to treat phenomena like data transfer and the opening
+and closing of channel scope in a modular fashion. The presence of
+multiple transition systems calls for a generic treatment of derived
+concurrency concepts such as strong and weak bisimilarity. We achieve
+such a treatment by capturing notions like scope opening and silent
+transitions abstractly using axiomatically defined algebraic structures.
+The foundation of these structures are, perhaps surprisingly, some old
+friends of the functional programmer, namely functors and monads, albeit
+in a different guise.
 
 \keywords{%
     Blockchain                    \and
