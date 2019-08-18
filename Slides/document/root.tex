@@ -1,0 +1,67 @@
+\documentclass{beamer}
+
+\usepackage{isabelle}
+\usepackage{isabellesym}
+
+\renewenvironment{isabellebody}
+    {\isamarkuptrue\isaspacing\isastyle}
+    {}
+\renewenvironment{isabellebodytt}
+    {\isamarkuptrue\isaspacing\isastylett}
+    {}
+
+\renewenvironment{isabelle}
+    {\begin{center}\begin{isabellebody}}
+    {\end{isabellebody}\end{center}}
+\renewenvironment{isabellett}
+    {\begin{center}\begin{isabellebodytt}}
+    {\end{isabellebodytt}\end{center}}
+
+\gdef\makeframetitle{}
+\renewcommand{\isamarkupparagraph}[1]
+    {\gdef\makeframetitle{\frametitle{#1}}}
+\renewenvironment{isapar}
+    {\begin{frame}\makeframetitle}
+    {\end{frame}\gdef\makeframetitle{}}
+
+\renewcommand{\textbf}[1]{\alert{#1}}
+
+\isabellestyle{it}
+\renewcommand{\isastyletext}{\normalsize\normalfont\sffamily}
+\renewcommand{\isastyletxt}{\normalfont\sffamily}
+\renewcommand{\isastylecmt}{\normalfont\sffamily}
+
+% End of Beamer–Isabelle integration
+
+\urlstyle{it}
+
+\usepackage{microtype}
+
+\usepackage{latexsym}
+\usepackage{amssymb}
+
+\mode<presentation>{\usetheme{EastLansing}}
+\setbeamercolor{alerted text}{fg=red}
+
+\begin{document}
+
+\title[A Process Calculus for Blockchains]{%
+    A Process Calculus\\
+    for Formally Verifying Blockchain Consensus Protocols%
+}
+\author{Wolfgang Jeltsch}
+\institute{Well-\!Typed LLP}
+\date[WFLP~’19]{%
+    WFLP~’19\bigskip\\
+    \scriptsize Cottbus, Germany\\10 September 2019%
+}
+
+\begin{frame}
+
+\titlepage
+
+\end{frame}
+
+\input{session}
+
+\end{document}

@@ -1,0 +1,11 @@
+chapter WFLP_2019
+
+session Slides = HOL +
+  description
+    \<open>A Process Calculus for Formally Verifying Blockchain Consensus Protocols (slides)\<close>
+  sessions
+    "HOL-Library"
+  theories
+    Content
+  document_files
+    "root.tex"
