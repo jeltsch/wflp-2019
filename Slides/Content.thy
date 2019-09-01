@@ -299,4 +299,6 @@ text \<open>
       \<^item> Covers also transition systems \<^bold>\<open>without\<close> scope opening
 \<close>
 
+section \<open>Residuals axiomatically\<close>
+
 end %invisible
