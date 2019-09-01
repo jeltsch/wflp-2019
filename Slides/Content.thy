@@ -285,8 +285,8 @@ text \<open>
 
   \<^item> Our solution:
 
-      \<^item> Describe abstractly what a lifting operation is\\
-        (using an axiomatically defined algebraic structure)
+      \<^item> Describe abstractly what a lifting operation is,\\
+        using an axiomatically defined algebraic structure
 
       \<^item> Define simulation relations and derived concepts\\
         solely in terms of a lifting operation
@@ -300,5 +300,59 @@ text \<open>
 \<close>
 
 section \<open>Residuals axiomatically\<close>
+
+subsection \<open>Residuals in general\<close>
+
+context %invisible residual begin
+
+paragraph \<open>Lifting operations\<close>
+
+text \<open>
+  \<^item> Intuition behind \<^term>\<open>lift \<X>\<close>:
+
+      \<^item> Labels must be equal
+
+      \<^item> Target processes must be related by \<^term>\<open>\<X>\<close>
+
+  \<^item> Axioms that are in line with this intuition:
+
+      \<^item> Monotonicity:@{lemma [display]
+        \<open>\<X> \<le> \<Y> \<Longrightarrow> lift \<X> \<le> lift \<Y>\<close>
+        by (fact lift_monotonicity)}
+
+      \<^item> Equality preservation:@{lemma [display]
+        \<open>lift (=) = (=)\<close>
+        by (fact lift_equality_preservation)}
+
+      \<^item> Composition preservation:@{lemma [display]
+        \<open>lift (\<X> OO \<Y>) = lift \<X> OO lift \<Y>\<close>
+        by (fact lift_composition_preservation)}
+
+      \<^item> Conversion preservation:@{lemma [display]
+        \<open>lift \<X>\<inverse>\<inverse> = (lift \<X>)\<inverse>\<inverse>\<close>
+        by (fact lift_conversion_preservation)}
+\<close>
+
+paragraph \<open>The name of the game\<close>
+
+text \<open>
+  \<^item> Residual structures are \<^bold>\<open>functors\<close> of a specific kind\\
+    (because of equality preservation and composition preservation)
+
+      \<^item> \<^bold>\<open>Not\<close> endofunctors on the category of types and \<^bold>\<open>functions\<close>\\
+        (functors in the Haskell sense)
+
+      \<^item> \<^bold>\<open>But\<close> endofunctors on the category of types and \<^bold>\<open>relations\<close>
+
+  \<^item> Residual structures are the same as \<^bold>\<open>relators\<close>
+
+  \<^item> Isabelle/HOL automatically generates relator-specific things\\for every data type
+
+      \<^item> The lifting operation
+
+      \<^item> Facts about the lifting operation, including the instances of the axioms
+\<close>
+
+end %invisible
 
 end %invisible
