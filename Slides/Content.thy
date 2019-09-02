@@ -30,8 +30,8 @@ text \<open>
 
   \<^item> Send value \<open>x\<close> to channel \<open>a\<close>:@{term [display] \<open>a \<triangleleft> x :: process\<close>}
 
-  \<^item> Receive value \<open>x\<close> from channel \<open>a\<close> and continue with \<^term>\<open>P x\<close>:@{term [display, source]
-    "a \<triangleright> x. P x"}
+  \<^item> Receive value \<open>x\<close> from channel \<open>a\<close> and continue with \<^term>\<open>P x\<close>:@{term [display]
+    \<open>a \<triangleright> x. P x\<close>}
 
   \<^item> Perform processes \<open>p\<close> and \<open>q\<close> concurrently:@{term [display] \<open>p \<parallel> q\<close>}
 
@@ -49,10 +49,12 @@ text \<open>
   \<^item> Key rules:
 
       \<^item> Sending:@{lemma [display]
-        \<open>a \<triangleleft> x \<rightarrow>\<lparr>a \<triangleleft> x\<rparr> \<zero>\<close> by (blast intro: sending output_without_opening)}
+        \<open>a \<triangleleft> x \<rightarrow>\<lparr>a \<triangleleft> x\<rparr> \<zero>\<close>
+        by (blast intro: sending output_without_opening)}
 
-      \<^item> Receiving:@{lemma [display, source]
-        "a \<triangleright> x. P x \<rightarrow>\<lparr>a \<triangleright> x\<rparr> P x" by (fastforce intro: receiving simple)}
+      \<^item> Receiving:@{lemma [display]
+        \<open>a \<triangleright> x. P x \<rightarrow>\<lparr>a \<triangleright> x\<rparr> P x\<close>
+        by (fastforce intro: receiving simple)}
 
       \<^item> Communication:@{lemma [display]
         \<open>\<lbrakk>p \<rightarrow>\<lparr>a \<triangleleft> x\<rparr> p'; q \<rightarrow>\<lparr>a \<triangleright> x\<rparr> q'\<rbrakk> \<Longrightarrow> p \<parallel> q \<rightarrow>\<lparr>\<tau>\<rparr> p' \<parallel> q'\<close>
@@ -144,8 +146,8 @@ text \<open>
 
   \<^item> Scope-related rules:
 
-      \<^item> Opening:@{lemma [display, source]
-        "\<nu> a. P a \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> P a"
+      \<^item> Opening:@{lemma [display]
+        \<open>\<nu> a. P a \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> P a\<close>
         by (rule opening)}
 
       \<^item> Closing after acting:@{lemma [display, source]
@@ -194,7 +196,7 @@ paragraph \<open>Residuals\<close>
 text \<open>
   \<^item> Binders in labels cover also target processes
 
-      \<^item> Basic transition system:@{term [display, source] "\<lbrace>\<nu> a\<rbrace> P a"}
+      \<^item> Basic transition system:@{term [display] \<open>\<lbrace>\<nu> a\<rbrace> P a\<close>}
 
       \<^item> Proper transition system:@{text [display] \<open>\<lparr>a \<triangleleft> \<nu> b\<^sub>1 \<dots> b\<^sub>n. f b\<^sub>1 \<dots> b\<^sub>n\<rparr> P b\<^sub>1 \<dots> b\<^sub>n\<close>}
 
@@ -202,9 +204,13 @@ text \<open>
 
     \<^item> Basic transition system:
 
-        \<^item> Acting:@{lemma [display, source] "Acting \<alpha> p \<equiv> \<lbrace>\<alpha>\<rbrace> p" by (fact reflexive)}
+        \<^item> Acting:@{lemma [display, source]
+          "Acting \<alpha> p \<equiv> \<lbrace>\<alpha>\<rbrace> p"
+          by (fact reflexive)}
 
-        \<^item> Opening:@{lemma [display, source] "Opening P \<equiv> \<lbrace>\<nu> a\<rbrace> P a" by (fact reflexive)}
+        \<^item> Opening:@{lemma [display, source]
+          "Opening P \<equiv> \<lbrace>\<nu> a\<rbrace> P a"
+          by (fact reflexive)}
 
     \<^item> Proper transition system:
 
@@ -262,8 +268,8 @@ text \<open>
             \<open>\<X> p q \<Longrightarrow> basic_lift \<X> (\<lbrace>\<alpha>\<rbrace> p) (\<lbrace>\<alpha>\<rbrace> q)\<close>
             by (blast intro: acting_lift)}
 
-          \<^item> Opening case:@{lemma [display, source]
-            "(\<And>a. \<X> (P a) (Q a)) \<Longrightarrow> basic_lift \<X> (\<lbrace>\<nu> a\<rbrace> P a) (\<lbrace>\<nu> a\<rbrace> Q a)"
+          \<^item> Opening case:@{lemma [display]
+            \<open>(\<And>a. \<X> (P a) (Q a)) \<Longrightarrow> basic_lift \<X> (\<lbrace>\<nu> a\<rbrace> P a) (\<lbrace>\<nu> a\<rbrace> Q a)\<close>
             by (blast intro: opening_lift)}
 
       \<^item> Simulation relations:@{lemma [display, source]
