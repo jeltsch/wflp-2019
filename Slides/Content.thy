@@ -49,10 +49,12 @@ text \<open>
   \<^item> Key rules:
 
       \<^item> Sending:@{lemma [display]
-        \<open>a \<triangleleft> x \<rightarrow>\<lparr>a \<triangleleft> x\<rparr> \<zero>\<close> by (blast intro: sending output_without_opening)}
+        \<open>a \<triangleleft> x \<rightarrow>\<lparr>a \<triangleleft> x\<rparr> \<zero>\<close>
+        by (blast intro: sending output_without_opening)}
 
       \<^item> Receiving:@{lemma [display]
-        \<open>a \<triangleright> x. P x \<rightarrow>\<lparr>a \<triangleright> x\<rparr> P x\<close> by (fastforce intro: receiving simple)}
+        \<open>a \<triangleright> x. P x \<rightarrow>\<lparr>a \<triangleright> x\<rparr> P x\<close>
+        by (fastforce intro: receiving simple)}
 
       \<^item> Communication:@{lemma [display]
         \<open>\<lbrakk>p \<rightarrow>\<lparr>a \<triangleleft> x\<rparr> p'; q \<rightarrow>\<lparr>a \<triangleright> x\<rparr> q'\<rbrakk> \<Longrightarrow> p \<parallel> q \<rightarrow>\<lparr>\<tau>\<rparr> p' \<parallel> q'\<close>
@@ -202,9 +204,13 @@ text \<open>
 
     \<^item> Basic transition system:
 
-        \<^item> Acting:@{lemma [display, source] "Acting \<alpha> p \<equiv> \<lbrace>\<alpha>\<rbrace> p" by (fact reflexive)}
+        \<^item> Acting:@{lemma [display, source]
+          "Acting \<alpha> p \<equiv> \<lbrace>\<alpha>\<rbrace> p"
+          by (fact reflexive)}
 
-        \<^item> Opening:@{lemma [display, source] "Opening P \<equiv> \<lbrace>\<nu> a\<rbrace> P a" by (fact reflexive)}
+        \<^item> Opening:@{lemma [display, source]
+          "Opening P \<equiv> \<lbrace>\<nu> a\<rbrace> P a"
+          by (fact reflexive)}
 
     \<^item> Proper transition system:
 
