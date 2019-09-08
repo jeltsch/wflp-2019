@@ -627,4 +627,48 @@ text \<open>
       \<^item> As a result, generic proofs tend to be simple
 \<close>
 
+subsection \<open>Normal weak residuals\<close>
+
+paragraph \<open>The single-label case\<close>
+
+text \<open>
+  \<^item> Typical weak transition systems have only a single silent label
+
+  \<^item> Constructing the corresponding residual structures\\leads to repetition
+
+      \<^item> Similar definitions of the silence-identifying relations
+
+      \<^item> Similar proofs of the instances of the axioms
+
+  \<^item> We introduce a more specific algebraic structure\\for reducing the boilerplate
+\<close>
+
+paragraph \<open>Weak residual structures with a single silent label\<close>
+
+text \<open>
+  \<^item> We use \<^term>\<open>silent\<close> alone to identify silence
+
+  \<^item> Axioms that ensure \<^term>\<open>silent\<close> identifies a single label:
+
+      \<^item> Left-uniqueness and left-totality:@{lemma [display]
+        \<open>silent OO silent\<inverse>\<inverse> = (=)\<close>
+        by (fact basic.silent_left_uniqueness_and_left_totality)}
+
+      \<^item> Right-uniqueness:@{lemma [display, source]
+        "silent\<inverse>\<inverse> OO silent \<le> (=)"
+        by (fact basic.silent_right_uniqueness)}
+
+      \<^item> Naturality (which is a theorem in the general case):@{lemma [display]
+        \<open>\<X> OO silent = silent OO lift \<X>\<close>
+        by (blast
+          elim: basic_silent.cases basic_lift_cases
+          intro: basic_internal_is_silent basic_lift_intros)}
+
+  \<^item> We derive \<^term>\<open>fuse\<close> from \<^term>\<open>silent\<close>:@{lemma [display]
+    \<open>fuse = silent\<inverse>\<inverse> \<squnion> lift silent\<inverse>\<inverse>\<close>
+    by (simp add: basic_fuse_def)}
+
+  \<^item> Both relations together always form a monad
+\<close>
+
 end %invisible
