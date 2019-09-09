@@ -99,6 +99,8 @@ subsection \<open>Basics\<close>
 paragraph \<open>Key properties\<close>
 
 text \<open>
+  \<^item> Universal
+
   \<^item> Inspired by the \<open>\<pi>\<close>-calculus and \<open>\<psi>\<close>-calculi
 
   \<^item> Embedded into functional host languages
@@ -108,24 +110,33 @@ text \<open>
       \<^item> Isabelle/HOL (for verification)
 
   \<^item> Uses higher-order abstract syntax\\
-    (binding structures represented by host-language functions)
+    (binding structures are represented by host-language functions)
 
-  \<^item> Minimalistic
+  \<^item> Minimalist
 \<close>
 
 paragraph \<open>Language\<close>
 
 text \<open>
-  \<^item> Do nothing:@{term [display] \<open>\<zero>\<close>}
+  \<^item> Do nothing:@{lemma [display, source]
+    "Stop \<equiv> \<zero>"
+    by (fact reflexive)}
 
-  \<^item> Send value \<open>x\<close> to channel \<open>a\<close>:@{term [display] \<open>a \<triangleleft> x :: process\<close>}
+  \<^item> Send value \<open>x\<close> to channel \<open>a\<close>:@{lemma [display, source]
+    "Send a x \<equiv> a \<triangleleft> x"
+    by (fact reflexive)}
 
-  \<^item> Receive value \<open>x\<close> from channel \<open>a\<close> and continue with \<^term>\<open>P x\<close>:@{term [display]
-    \<open>a \<triangleright> x. P x\<close>}
+  \<^item> Receive value \<open>x\<close> from channel \<open>a\<close> and continue with \<^term>\<open>P x\<close>:@{lemma [display, source]
+    "Receive a P \<equiv> a \<triangleright> x. P x"
+    by (fact reflexive)}
 
-  \<^item> Perform processes \<open>p\<close> and \<open>q\<close> concurrently:@{term [display] \<open>p \<parallel> q\<close>}
+  \<^item> Perform processes \<open>p\<close> and \<open>q\<close> concurrently:@{lemma [display, source]
+    "Parallel p q \<equiv> p \<parallel> q"
+    by (fact reflexive)}
 
-  \<^item> Create new channel \<open>a\<close> and continue with \<^term>\<open>P a\<close>:@{term [display] \<open>\<nu> a. P a :: process\<close>}
+  \<^item> Create new channel \<open>a\<close> and continue with \<^term>\<open>P a\<close>:@{lemma [display, source]
+    "NewChannel P \<equiv> \<nu> a. P a"
+    by (fact reflexive)}
 \<close>
 
 subsection \<open>Operational semantics\<close>
@@ -175,7 +186,7 @@ proof -
 qed
 
 text \<open>
-  \<^item> Comparatively simple rules involving scope:
+  \<^item> Rules involving scope as found in the \<open>\<pi>\<close>-calculus:
 
       \<^item> Scope opening:@{lemma [display]
         \<open>(\<And>b. P b \<rightarrow>\<lparr>a \<triangleleft> \<cent>b\<rparr> Q b) \<Longrightarrow> \<nu> b. P b \<rightarrow>\<lparr>a \<triangleleft> \<nu> b. \<cent>b\<rparr> Q b\<close>
@@ -264,11 +275,11 @@ text \<open>
         \<open>p \<rightarrow>\<^sub>\<flat>\<lbrace>a \<triangleright> x\<rbrace> q \<Longrightarrow> p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleright> x\<rparr> q\<close>
         by (auto intro: simple)}
 
-      \<^item> Silent action:@{lemma [display]
+      \<^item> Internal action:@{lemma [display]
         \<open>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<tau>\<rbrace> q \<Longrightarrow> p \<rightarrow>\<^sub>\<sharp>\<lparr>\<tau>\<rparr> q\<close>
         by (auto intro: simple)}
 
-  \<^item> Opening (general idea):
+  \<^item> Scope opening (general idea):
 
       \<^item> One scope:@{lemma [display, source]
         "\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> P b; \<And>b. P b \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> f b\<rparr> Q b\<rbrakk> \<Longrightarrow>\<^latex>\<open>\\\<close>p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b. f b\<rparr> Q b"
@@ -306,7 +317,7 @@ text \<open>
 
         \<^item> More complex
 
-        \<^item> Otherwise similar to basic transition system
+        \<^item> Otherwise similar to the basic transition system
 \<close>
 
 subsection \<open>Behavioral equivalence\<close>
@@ -319,7 +330,8 @@ paragraph \<open>Bisimilarity\<close>
   We prove the forward part of the first statement of the slide specialized to the proper transition
   system and restricted to simple transitions as a sanity check.
 *)
-lemma %invisible "proper.sim \<X> \<Longrightarrow> (\<forall>p q \<delta> p'. \<X> p q \<and> p \<rightarrow>\<^sub>\<sharp>\<lparr>\<delta>\<rparr> p' \<longrightarrow> (\<exists>q'. q \<rightarrow>\<^sub>\<sharp>\<lparr>\<delta>\<rparr> q' \<and> \<X> p' q'))"
+lemma %invisible
+  shows "proper.sim \<X> \<Longrightarrow> (\<forall>p q \<delta> p'. \<X> p q \<and> p \<rightarrow>\<^sub>\<sharp>\<lparr>\<delta>\<rparr> p' \<longrightarrow> (\<exists>q'. q \<rightarrow>\<^sub>\<sharp>\<lparr>\<delta>\<rparr> q' \<and> \<X> p' q'))"
   by (blast elim: proper_lift_cases intro: simple_lift)
 
 text \<open>
@@ -338,7 +350,7 @@ text \<open>
         \<open>(\<sim>) = (GREATEST \<X>. bisim \<X>)\<close>
         by (fact bisimilarity_is_greatest_bisimulation)}
 
-  \<^item> Standard definition of \<^term>\<open>sim\<close> does not work with scope opening
+  \<^item> The standard definition of \<^term>\<open>sim\<close> does not work with scope opening
 
       \<^item> Assumes one target process
 
@@ -368,9 +380,9 @@ text \<open>
 
   \<^item> Definition for the proper transition system:
 
-      \<^item> Lifting: \<^bold>\<open>analogous\<close>
+      \<^item> Lifting: analogous
 
-      \<^item> Simulation relations: \<^bold>\<open>identical\<close>\\
+      \<^item> Simulation relations: identical\\
         (apart from the use of a different lifting operation)
 \<close>
 
@@ -392,7 +404,8 @@ text \<open>
       \<^item> Covers not only the two transition systems of the \<open>\<natural>\<close>-calculus\\
         but also transition systems of other process calculi
 
-      \<^item> Covers also transition systems \<^bold>\<open>without\<close> scope opening
+      \<^item> Covers also transition systems \<^bold>\<open>without\<close> scope opening\\
+        (for example, CCS)
 \<close>
 
 section \<open>Residuals axiomatically\<close>
@@ -435,10 +448,10 @@ text \<open>
   \<^item> Residual structures are \<^bold>\<open>functors\<close> of a specific kind\\
     (because of equality preservation and composition preservation)
 
-      \<^item> \<^bold>\<open>Not\<close> endofunctors on the category of types and \<^bold>\<open>functions\<close>\\
+      \<^item> Not endofunctors on the category of types and \<^bold>\<open>functions\<close>\\
         (functors in the Haskell sense)
 
-      \<^item> \<^bold>\<open>But\<close> endofunctors on the category of types and \<^bold>\<open>relations\<close>
+      \<^item> But endofunctors on the category of types and \<^bold>\<open>relations\<close>
 
   \<^item> Residual structures are the same as \<^bold>\<open>relators\<close>
 
@@ -633,7 +646,7 @@ text \<open>
         by (rule basic.composed_transition, auto simp add: basic_absorb_from_fuse)}
 
   \<^item> Definition for the proper transition system: identical\\
-    (apart from the use of different relations that identify silence)
+    (apart from the use of different silence-identifying relations)
 \<close>
 
 (*
