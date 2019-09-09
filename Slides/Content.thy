@@ -761,4 +761,18 @@ text \<open>
   \<^item> Both relations together always form a monad
 \<close>
 
+section \<open>Wrapping up\<close>
+
+paragraph \<open>Some kind requests\<close>
+
+text \<open>
+  \<^item> Receive my thanks for your attention
+
+  \<^item> Ask question
+
+  \<^item> Share your thoughts
+
+  \<^item> Follow us on GitHub:\\\<^url>\<open>https://github.com/input-output-hk/fm-ouroboros\<close>
+\<close>
+
 end %invisible
