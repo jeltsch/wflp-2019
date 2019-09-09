@@ -51,6 +51,9 @@
 \mode<presentation>{\usetheme{EastLansing}}
 \setbeamercolor{alerted text}{fg=red}
 
+\pgfdeclareimage[height=4ex]{logo-well-typed}{logo-well-typed.pdf}
+\pgfdeclareimage[height=4ex]{logo-iohk}{logo-iohk.pdf}
+
 \begin{document}
 
 \title[A Process Calculus for Blockchains]{%
@@ -58,7 +61,9 @@
     for Formally Verifying Blockchain Consensus Protocols%
 }
 \author{Wolfgang Jeltsch}
-\institute{Well-\!Typed LLP \and IOHK}
+\institute[Well-\!Typed LLP \and IOHK]{%
+    \pgfuseimage{logo-well-typed}\qquad\pgfuseimage{logo-iohk}%
+}
 \date[WFLP~’19]{%
     WFLP~’19\bigskip\\
     \scriptsize Cottbus, Germany\\10 September 2019%
