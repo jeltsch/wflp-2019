@@ -2,6 +2,96 @@ theory %invisible Content
   imports Chi_Calculus.Proper_Weak_Transition_System
 begin
 
+section \<open>Introduction\<close>
+
+paragraph \<open>Blockchains\<close>
+
+text \<open>
+  \<^item> A blockchain is a database with the following properties:
+
+      \<^item> Distributed
+
+      \<^item> Open
+
+      \<^item> Secure
+
+      \<^item> Containing a growing list
+
+  \<^item> Applications:
+
+      \<^item> Cryptocurrencies
+
+      \<^item> Smart contracts
+
+      \<^item> Supply chain monitoring
+
+      \<^item> etc.
+
+  \<^item> Data consistency is established using a \<^bold>\<open>consensus protocol\<close>
+
+      \<^item> Proof of work
+
+      \<^item> Proof of stake
+\<close>
+
+paragraph \<open>Cardano\<close>
+
+text \<open>
+  \<^item> Ouroboros family of consensus protocols
+
+      \<^item> Proof of stake
+
+      \<^item> Rigorous security guarantees\\(Ouroboros was the first proof-of-stake protocol to have them)
+
+  \<^item> Cryptocurrency Ada
+
+  \<^item> Two smart contract languages
+
+      \<^item> Plutus
+
+          \<^item> Functional
+
+          \<^item> Turing-complete
+
+      \<^item> Marlowe
+
+          \<^item> Functional
+
+          \<^item> Restricted (to make implementing common contracts easy)
+\<close>
+
+paragraph \<open>IOHK\<close>
+
+text \<open>
+  \<^item> The company behind Cardano
+
+  \<^item> Areas of work:
+
+      \<^item> Research
+
+      \<^item> Development
+
+  \<^item> The \<^bold>\<open>Formal Methods Group\<close> links research and development
+
+      \<^item> Lightweight formal methods
+
+          \<^item> Specification
+
+          \<^item> Property-based testing
+
+      \<^item> Formal verification
+
+  \<^item> Current formal verification target: the Ouroboros protocol family
+
+      \<^item> Long-term project
+
+      \<^item> First outcome: the \<^bold>\<open>\<open>\<natural>\<close>-calculus\<close>
+
+          \<^item> A process calculus
+
+          \<^item> Serves as our implementation language
+\<close>
+
 section \<open>The \<open>\<natural>\<close>-calculus\<close>
 
 subsection \<open>Basics\<close>
