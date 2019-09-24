@@ -249,7 +249,7 @@ text \<open>
 
       \<^item> Opening:@{lemma [display]
         \<open>\<nu> a. P a \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> P a\<close>
-        by (rule opening)}
+        by (fact opening)}
 
       \<^item> Closing after acting:@{lemma [display, source]
         "\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> Q a; \<And>a. Q a \<rightarrow>\<^sub>\<flat>\<lbrace>\<alpha>\<rbrace> R a\<rbrakk> \<Longrightarrow>\<^latex>\<open>\\\<close>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<alpha>\<rbrace> \<nu> a. R a"
@@ -488,7 +488,7 @@ proof
   proof (induction p "\<lparr>\<tau>\<rparr> q" arbitrary: q)
     case strong_transition
     then show ?case
-      by (rule r_into_rtranclp)
+      by (fact r_into_rtranclp)
   next
     case silent_transition
     then show ?case
@@ -498,7 +498,7 @@ proof
     then obtain u where "p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* u" and "u \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
       by (blast elim: proper_silent.cases proper_lift_cases)
     then show ?case
-      by (rule rtranclp_trans)
+      by (fact rtranclp_trans)
   qed
 next
   assume "p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
