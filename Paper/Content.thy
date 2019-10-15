@@ -9,22 +9,22 @@ text \<open>
   code\<^latex>\<open>~\cite{jeltsch:wflp-2019-source}\<close>, which has been checked with Isabelle2018.
 \<close>
 
-section \<open>The \<open>\<natural>\<close>-calculus\<close>
+section \<open>The \<open>\<natural>\<close>-Calculus\<close>
 
 subsection \<open>Basics\<close>
 
-subsection \<open>Operational semantics\<close>
+subsection \<open>Operational Semantics\<close>
 
-subsection \<open>Behavioral equivalence\<close>
+subsection \<open>Behavioral Equivalence\<close>
 
-section \<open>Residuals axiomatically\<close>
+section \<open>Residuals Axiomatically\<close>
 
-subsection \<open>Residuals in general\<close>
+subsection \<open>Residuals in General\<close>
 
-subsection \<open>Weak residuals\<close>
+subsection \<open>Weak Residuals\<close>
 
-subsection \<open>Normal weak residuals\<close>
+subsection \<open>Normal Weak Residuals\<close>
 
-section \<open>Wrapping up\<close>
+section \<open>Wrapping Up\<close>
 
 end %invisible
