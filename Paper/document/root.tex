@@ -11,9 +11,18 @@
 
 \usepackage{amsmath}
 
-\renewcommand{\isaendpar}{}
-\renewcommand{\isacommand}[1]
-    {\ifisamarkup\medskip\par\fi\isakeyword{#1}}
+\renewenvironment{isamarkuptext}{\par}{}
+\renewenvironment{isamarkuptxt}{\par}{}
+
+\renewenvironment{isabellebody}{}{}
+\renewenvironment{isabellebodytt}{}{}
+
+\renewenvironment{isabelle}
+    {\begin{center}\isaspacing\isastyle}
+    {\end{center}}
+\renewenvironment{isabellett}
+    {\begin{center}\isaspacing\isastylett}
+    {\end{center}}
 
 \urlstyle{it}
 \isabellestyle{it}
