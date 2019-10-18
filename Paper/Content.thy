@@ -14,12 +14,16 @@ section \<open>The \<open>\<natural>\<close>-Calculus\<close>
 text \<open>
   The \<open>\<natural>\<close>-calculus is a process calculus in the tradition of the
   \<open>\<pi>\<close>-calculus~@{cite "milner:pi-calculus"}. It is not tied to blockchains in any way but is a
-  universal language for concurrent and distributed computing. Unlike the \<open>\<pi>\<close>-calculus, the
-  \<open>\<natural>\<close>-calculus is not an isolated language but is embedded into functional host languages. In our
-  application scenario, we use embeddings into both Haskell, for execution, and Isabelle/HOL, for
-  verification. The user is expected to write programs as Haskell-embedded process calculus terms,
-  which can then be turned automatically into Isabelle-embedded process calculus terms to make them
-  available for verification.
+  universal language for concurrent and distributed computing.
+
+  Unlike the \<open>\<pi>\<close>-calculus, the \<open>\<natural>\<close>-calculus is not an isolated language but is embedded into
+  functional host languages. In our application scenario, we use embeddings into both Haskell, for
+  execution, and Isabelle/HOL, for verification. The user is expected to write programs as
+  Haskell-embedded process calculus terms, which can then be turned automatically into
+  Isabelle-embedded process calculus terms to make them available for verification. In this paper,
+  we focus on the Isabelle embedding, leaving the discussion of the Haskell embedding for another
+  time. Whenever we use the term ``\<open>\<natural>\<close>-calculus'', we refer to either the calculus in general or its
+  embedding into Isabelle/HOL.
 
   Our embedding technique uses higher-order abstract syntax (HOAS)~@{cite "pfenning:pldi-1988"},
   which means we represent binding of names using functions of the host language. An immediate
@@ -28,11 +32,7 @@ text \<open>
   HOAS gives us support for arbitrary data for free, since we can easily represent data by values of
   the host language. This lifts the restriction of the \<open>\<pi>\<close>-calculus that channels are the only kind
   of data. Finally, HOAS allows us to move computation, branching, and recursion to the host
-  language level and thus further simplify the implementation of the calculus.\<^footnote>\<open>The full set of
-  simplifications is only available for the Isabelle/HOL embedding. The Haskell embedding can only
-  delegate the handling of names to the host language, since it must express data terms as well as
-  branching and recursion statements at the level of the object language to make the Isabelle export
-  of process calculus terms possible.\<close>
+  language level and thus further simplify the implementation of the calculus.
 
   The \<open>\<natural>\<close>-calculus is similar to \<open>\<psi>\<close>-calculi~@{cite "bengtson:lmcs-7-1"} in that it adds support for
   arbitrary data to the core features of the \<open>\<pi>\<close>-calculus. However, since the \<open>\<natural>\<close>-calculus uses
