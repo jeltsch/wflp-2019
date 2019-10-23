@@ -25,6 +25,8 @@ subsection \<open>Weak Residuals\<close>
 
 subsection \<open>Normal Weak Residuals\<close>
 
-section \<open>Wrapping Up\<close>
+section \<open>Related Work\<close>
+
+section \<open>Summary and Outlook\<close>
 
 end %invisible
