@@ -114,6 +114,205 @@ text \<open>
 
 subsection \<open>Operational Semantics\<close>
 
+text_raw \<open>\label{operational-semantics}\<close>
+
+no_notation %invisible proper_transition (infix "\<rightarrow>\<^sub>\<sharp>" 50)
+notation %invisible proper_transition ("_ \<rightarrow>_" [51, 51] 50)
+
+text \<open>
+  We define the operational semantics of the \<open>\<natural>\<close>-calculus as a labeled transition system. We write
+  \<^term>\<open>p \<rightarrow>\<lparr>\<xi>\<rparr> q\<close> to say that \<^term>\<open>p\<close> can transition to~\<^term>\<open>q\<close> with label~\<^term>\<open>\<xi>\<close>.
+
+  We handle isolated sending and receiving as well as communication in the standard manner. We
+  introduce labels \<^term>\<open>a \<triangleleft> x :: basic_action\<close>, \<^term>\<open>a \<triangleright> x :: proper_action\<close>, and
+  \<^term>\<open>\<tau> :: proper_action\<close>, which denote sending of a value~\<^term>\<open>x\<close> to a channel~\<^term>\<open>a\<close>,
+  receiving of a value~\<^term>\<open>x\<close> from a channel~\<^term>\<open>a\<close>, and internal communication, respectively,
+  and call these labels ``actions''. Then we introduce the following rules:
+
+    \<^item> Sending:@{lemma [display]
+      \<open>a \<triangleleft> x \<rightarrow>\<lparr>a \<triangleleft> x\<rparr> \<zero>\<close>
+      by (blast intro: sending output_without_opening)}
+
+    \<^item> Receiving:@{lemma [display]
+      \<open>a \<triangleright> x. P x \<rightarrow>\<lparr>a \<triangleright> x\<rparr> P x\<close>
+      by (fastforce intro: receiving simple)}
+
+    \<^item> Communication:@{lemma [display]
+      \<open>\<lbrakk>p \<rightarrow>\<lparr>a \<triangleleft> x\<rparr> p'; q \<rightarrow>\<lparr>a \<triangleright> x\<rparr> q'\<rbrakk> \<Longrightarrow> p \<parallel> q \<rightarrow>\<lparr>\<tau>\<rparr> p' \<parallel> q'\<close>
+      by (fastforce elim: proper_transition.cases intro: ltr communication simple)}
+
+    \<^item> Acting within a subsystem:@{lemma [display]
+      \<open>p \<rightarrow>\<lparr>\<xi>\<rparr> p' \<Longrightarrow> p \<parallel> q \<rightarrow>\<lparr>\<xi>\<rparr> p' \<parallel> q\<close>
+      by (blast elim: proper_transition.cases intro: acting_left simple)}
+
+  \<^noindent> The last two of these rules have symmetric versions, which we do not show here for the sake of
+  simplicity.
+\<close>
+
+axiomatization %invisible chan_to_val :: "chan \<Rightarrow> val" ("\<cent>_")
+text_raw \<open>\renewcommand{\isasymcent}{}\<close>
+
+lemma %invisible pi_calculus_closing:
+  assumes "p \<rightarrow>\<lparr>a \<triangleleft> \<nu> b. \<cent>b\<rparr> P b" and "\<And>b. q \<rightarrow>\<lparr>a \<triangleright> \<cent>b\<rparr> Q b"
+  shows "p \<parallel> q \<rightarrow>\<lparr>\<tau>\<rparr> \<nu> b. (P b \<parallel> Q b)"
+proof -
+  from assms(1) obtain U where "p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> U b" and "\<And>b. U b \<rightarrow>\<^sub>\<flat>\<lbrace>a \<triangleleft> \<cent>b\<rbrace> P b"
+    by (fast elim: proper_transition.cases)
+  moreover from assms(2) have "\<And>b. q \<rightarrow>\<^sub>\<flat>\<lbrace>a \<triangleright> \<cent>b\<rbrace> Q b"
+    by (fastforce elim: proper_transition.cases)
+  ultimately show ?thesis
+    by (fastforce intro: ltr communication opening_left scoped_acting simple)
+qed
+
+text \<open>
+  Channels created by \<^const>\<open>NewChannel\<close> are initially local. However, such channels can later be
+  made visible by sending them to other subsystems. Let us see how this is captured by the
+  transition system of the \<open>\<pi>\<close>-calculus. Besides ordinary sending labels
+  \<^term>\<open>a \<triangleleft> b :: basic_action\<close>, the \<open>\<pi>\<close>-calculus has labels \<open>a \<triangleleft> \<nu> b. b\<close> that additionally
+  bind the variable~\<^term>\<open>b\<close>. The bound variable denotes a channel not yet known to the outside.
+  Using it as the value being sent thus conveys the information that a local channel is being
+  published by sending it to~\<^term>\<open>a\<close>. When used as part of a transition statement, the scope of the
+  binder includes the target process, so that the target process can depend on the published
+  channel. Therefore, the general form of a transition statement with local channel publication is
+  \<^term>\<open>p \<rightarrow>\<lparr>a \<triangleleft> \<nu> b. \<cent>b\<rparr> Q b\<close>. The \<open>\<pi>\<close>-calculus contains the following rules to deal with local
+  channels:
+
+    \<^item> Scope opening:@{lemma [display]
+      \<open>(\<And>b. P b \<rightarrow>\<lparr>a \<triangleleft> \<cent>b\<rparr> Q b) \<Longrightarrow> \<nu> b. P b \<rightarrow>\<lparr>a \<triangleleft> \<nu> b. \<cent>b\<rparr> Q b\<close>
+      by (blast intro: opening output_with_opening)}
+
+    \<^item> Communication with scope closing:@{lemma [display]
+      \<open>\<lbrakk>p \<rightarrow>\<lparr>a \<triangleleft> \<nu> b. \<cent>b\<rparr> P b; \<And>b. q \<rightarrow>\<lparr>a \<triangleright> \<cent>b\<rparr> Q b\<rbrakk> \<Longrightarrow> p \<parallel> q \<rightarrow>\<lparr>\<tau>\<rparr> \<nu> b. (P b \<parallel> Q b)\<close>
+      by (fact pi_calculus_closing)}
+
+    \<^item> Acting inside scope:@{lemma [display]
+      \<open>(\<And>a. P a \<rightarrow>\<lparr>\<delta>\<rparr> Q a) \<Longrightarrow> \<nu> a. P a \<rightarrow>\<lparr>\<delta>\<rparr> \<nu> a. Q a\<close>
+      by (blast elim: proper_transition.cases intro: acting_scope simple)}
+
+  For the \<open>\<natural>\<close>-calculus, these rules are unfortunately not enough. Unlike the \<open>\<pi>\<close>-calculus, the
+  \<open>\<natural>\<close>-calculus permits arbitrary data to be sent, which includes values that contain several
+  channels, like pairs of channels and lists of channels. As a result, several local channels can be
+  published at once. Variants of the above rules that account for this possibility are complex and
+  hard to get right. The complexity has two reasons:
+
+    \<^item> Some labels deal with multiple concepts, namely scope opening and sending. In the
+      \<open>\<natural>\<close>-calculus, these labels are not always of the relatively simple form \<open>a \<triangleleft> \<nu> b. b\<close> discussed
+      above, but generally of the more complex form \<open>\<nu> b\<^sub>1 \<dots> b\<^sub>n. a \<triangleleft> f b\<^sub>1 \<dots> b\<^sub>n\<close>, because arbitrary
+      values depending on multiple local channels can be sent.
+
+    \<^item> Some rules deal with multiple concepts, namely the rule about communication with scope
+      closing, which deals with precisely these two things, and the rule about acting inside scope,
+      which essentially adds scope opening before and scope closing after the given action.
+\<close>
+
+no_notation %invisible basic_transition (infix "\<rightarrow>\<^sub>\<flat>" 50)
+notation %invisible basic_transition ("_ \<rightarrow>\<^sub>\<flat>_" [51, 51] 50)
+
+no_notation %invisible proper_transition ("_ \<rightarrow>_" [51, 51] 50)
+notation %invisible proper_transition ("_ \<rightarrow>\<^sub>\<sharp>_" [51, 51] 50)
+
+text \<open>
+  To tame this complexity, we conduct the definition of the transition system in two steps:
+
+    \<^enum> We define a transition system that uses distinct transitions for opening scopes, so that each
+      label and each rule deals with a single concept only. We call this transition system the
+      \<^emph>\<open>basic transition system\<close> and write a transition in this system \<^term>\<open>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<xi>\<rbrace> q\<close>.
+
+    \<^enum> We define the transition system that describes the actual semantics of the \<open>\<natural>\<close>-calculus by
+      adding a layer on top of the basic transition system that bundles scope opening and sending
+      transitions. We call this transition system the \<^emph>\<open>proper transition system\<close> and write a
+      transition in this system \<^term>\<open>p \<rightarrow>\<^sub>\<sharp>\<lparr>\<xi>\<rparr> q\<close>.
+
+  The basic transition system has action labels \<^term>\<open>a \<triangleleft> x :: basic_action\<close>,
+  \<^term>\<open>a \<triangleright> x :: basic_action\<close>, and \<^term>\<open>\<tau> :: basic_action\<close> as well as opening labels~\<open>\<nu> a\<close>, which
+  bind their variables in any following target process. Its rules for sending, receiving, and
+  communication are the ones we have seen at the beginning of \hyperref[operational-semantics]{this
+  subsection}. For dealing with local channels, the basic transition system contains the following
+  rules:
+
+    \<^item> Scope opening:@{lemma [display]
+      \<open>\<nu> a. P a \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> P a\<close>
+      by (fact opening)}
+
+    \<^item> Scope closing after acting:@{lemma [display]
+      \<open>\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> Q a; \<And>a. Q a \<rightarrow>\<^sub>\<flat>\<lbrace>\<alpha>\<rbrace> R a\<rbrakk> \<Longrightarrow> p \<rightarrow>\<^sub>\<flat>\<lbrace>\<alpha>\<rbrace> \<nu> a. R a\<close>
+      by (fact scoped_acting)}
+
+    \<^item> Scope closing after another scope opening:@{lemma [display]
+      \<open>\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> Q a; \<And>a. Q a \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> R a b\<rbrakk> \<Longrightarrow> p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> \<nu> a. R a b\<close>
+      by (fact scoped_opening)}
+
+    \<^item> Scope opening within a subsystem:@{lemma [display]
+      \<open>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> P a \<Longrightarrow> p \<parallel> q \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> P a \<parallel> q\<close>
+      by (fact opening_left)}
+
+  \<^noindent> The last rule has a symmetric version, which we do not show here for the sake of simplicity.
+
+  The proper transition system has labels \<^term>\<open>a \<triangleright> x :: proper_action\<close>, \<^term>\<open>\<tau> :: proper_action\<close>,
+  and \<open>a \<triangleleft> \<nu> b\<^sub>1 \<dots> b\<^sub>n. f b\<^sub>1 \<dots> b\<^sub>n\<close>, which bind their variables also in any following target process.
+  Its rules for sending, receiving, and communication just refer to the basic transition system:
+
+    \<^item> Sending:@{lemma [display]
+      \<open>p \<rightarrow>\<^sub>\<flat>\<lbrace>a \<triangleleft> x\<rbrace> q \<Longrightarrow> p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> x\<rparr> q\<close>
+      by (blast intro: output_without_opening)}
+
+    \<^item> Receiving:@{lemma [display]
+      \<open>p \<rightarrow>\<^sub>\<flat>\<lbrace>a \<triangleright> x\<rbrace> q \<Longrightarrow> p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleright> x\<rparr> q\<close>
+      by (auto intro: simple)}
+
+    \<^item> Communication:@{lemma [display]
+      \<open>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<tau>\<rbrace> q \<Longrightarrow> p \<rightarrow>\<^sub>\<sharp>\<lparr>\<tau>\<rparr> q\<close>
+      by (auto intro: simple)}
+
+  \<^noindent> For scope opening, we have a series of facts, one for each number of published channels. The
+  facts for one and two published channels are as follows:
+
+    \<^item> One channel:@{lemma [display]
+      \<open>\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> P b; \<And>b. P b \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> f b\<rparr> Q b\<rbrakk> \<Longrightarrow> p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b. f b\<rparr> Q b\<close>
+      by (fact output_with_opening)}
+
+    \<^item> Two channels:@{lemma [display, source]
+      "\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> P b; \<And>b. P b \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> c. f b c\<rparr> Q b c\<rbrakk> \<Longrightarrow>\<^latex>\<open>\\\<close>p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b c. f b c\<rparr> Q b c"
+      by (fact output_with_opening)}
+
+  \<^noindent> The facts for more published channels are analogous. All of these facts can be captured by a
+  single rule, which we do not show here for the sake of simplicity.
+
+  As it stands, the proper transition system has the issue that a scope can also be opened when the
+  respective channel is actually not published. For example, @{lemma\<open>\<nu> b. a \<triangleleft> x \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b. x\<rparr> \<zero>\<close> by
+  (blast intro: opening sending output_without_opening output_with_opening)} is a possible
+  transition. We are currently investigating ways to fix this issue. That said, this issue is of
+  little relevance for the rest of this paper, where we discuss the effects of transitions involving
+  scope opening in a way that is largely independent of the particularities of a concrete transition
+  system.
+
+  A key issue with both the basic and the proper transition system is that, whenever a label
+  contains a binder, the scope of this binder includes any following target process. As a result, we
+  can treat neither of the two transition relations as a ternary relation, where source processes,
+  labels, and target processes are separate entities. As a solution, we treat the combination of a
+  label and an associated target process as a single entity, which we call a residual. Our
+  transition relation then become binary, relating source processes and residuals. This approach has
+  been taken in \<open>\<psi>\<close>-calculi, for example.
+
+  We define an inductive data type \<^type>\<open>basic_residual\<close> whose values are the residuals of the basic
+  transition system. There are two kinds of such residuals:
+
+    \<^item> Acting:@{lemma [display, source]
+      "Acting \<alpha> p \<equiv> \<lbrace>\<alpha>\<rbrace> p"
+      by (fact reflexive)}
+
+    \<^item> Opening:@{lemma [display, source]
+      "Opening P \<equiv> \<lbrace>\<nu> a\<rbrace> P a"
+      by (fact reflexive)}
+
+  \<^noindent> Note that in the \<open>Opening\<close> case we use HOAS and binder notation again.
+
+  We also introduce an analogous data type \<^type>\<open>proper_residual\<close> for the proper transition system.
+  The definition of \<^type>\<open>proper_residual\<close> is considerably more complex than the definition of
+  \<^type>\<open>basic_residual\<close>, which is why we do not show it here. However, its general approach to
+  capturing scope opening is the same.
+\<close>
+
 subsection \<open>Behavioral Equivalence\<close>
 
 section \<open>Residuals Axiomatically\<close>
