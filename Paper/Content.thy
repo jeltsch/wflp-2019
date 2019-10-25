@@ -73,8 +73,8 @@ text \<open>
       "NewChannel P \<equiv> \<nu> a. P a"
       by (fact reflexive)}
 
-  \noindent The binders (\<open>\<triangleleft>\<close>~and~\<open>\<nu>\<close>) bind stronger than the infix operator~(\<open>\<parallel>\<close>), which is not what
-  the reader might have expected but is typical for process calculi.
+  \<^noindent> The binders (\<open>\<triangleleft>\<close>~and~\<open>\<nu>\<close>) bind stronger than the infix operator~(\<open>\<parallel>\<close>), which is not what the
+  reader might have expected but is typical for process calculi.
 
   There are a few interesting points to note regarding processes and their notation:
 
