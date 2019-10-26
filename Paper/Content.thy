@@ -315,6 +315,86 @@ text \<open>
 
 subsection \<open>Behavioral Equivalence\<close>
 
+context %invisible transition_system begin
+
+(*
+  We prove the forward part of the first statement of the slide specialized to the proper transition
+  system and restricted to simple transitions as a sanity check.
+*)
+lemma %invisible
+  shows "proper.sim \<X> \<Longrightarrow> (\<forall>p q \<delta> p'. \<X> p q \<and> p \<rightarrow>\<^sub>\<sharp>\<lparr>\<delta>\<rparr> p' \<longrightarrow> (\<exists>q'. q \<rightarrow>\<^sub>\<sharp>\<lparr>\<delta>\<rparr> q' \<and> \<X> p' q'))"
+  by (blast elim: proper_lift_cases intro: simple_lift)
+
+text \<open>
+  Ultimately, we are interested in proving that different processes behave in the same or at least a
+  similar way. The standard notion of behavioral equivalence is \<^emph>\<open>bisimilarity\<close>. A typical approach
+  to define bisimilarity is the following one:
+
+    \<^enum> We define the predicate \<^const>\<open>sim\<close> on binary relations between process as
+      follows:@{text [display]
+      \<open>sim \<X> \<longleftrightarrow>(\<forall>p q \<xi> p'. \<X> p q \<and> p \<rightarrow>\<lparr>\<xi>\<rparr> p' \<longrightarrow> (\<exists>q'. q \<rightarrow>\<lparr>\<xi>\<rparr> q' \<and> \<X> p' q'))\<close>}
+      A relation \<^term>\<open>\<X>\<close> for which \<^term>\<open>sim \<X>\<close> holds is called a \<^emph>\<open>simulation relation\<close>.
+
+    \<^enum> We define the predicate \<^const>\<open>bisim\<close> on binary relations between process as
+      follows:@{lemma [display, source]
+      "bisim \<X> \<longleftrightarrow> sim \<X> \<and> sim \<X>\<inverse>\<inverse>"
+      by (fact refl)}
+      A relation \<^term>\<open>\<X>\<close> for which \<^term>\<open>bisim \<X>\<close> holds is called a \<^emph>\<open>bisimulation relation\<close>.
+
+    \<^enum> We define bisimilarity as the greatest bisimulation relation:@{lemma [display]
+      \<open>(\<sim>) = (GREATEST \<X>. bisim \<X>)\<close>
+      by (fact bisimilarity_is_greatest_bisimulation)}
+
+  The above definition of \<^term>\<open>sim\<close> assumes each transition has exactly one target process and it
+  refers to labels and target processes separately. This is a problem in the presence of scope
+  opening, where labels and target processes have to be considered together and where a single
+  transition may have different target processes depending on published channels.
+\<close>
+
+end %invisible
+
+text \<open>
+  Let us see how we can solve this problem for the basic transition system. We develop a definition
+  of the notion of simulation relation that retains the essence of the above definition but is able
+  to deal with the peculiarities of opening residuals. First, we define an operation
+  \<^const>\<open>basic_lift\<close> that turns a relation between processes into a relation between basic
+  residuals. The general idea is that \<^term>\<open>basic_lift \<X>\<close> relates two residuals if and only if their
+  labels are the same and their target process are in relation~\<^term>\<open>\<X>\<close>. This idea can be tweaked in
+  an obvious way to work with opening residuals. We define \<^const>\<open>basic_lift\<close> inductively using the
+  following two rules:
+
+    \<^item> Acting case:@{lemma [display]
+      \<open>\<X> p q \<Longrightarrow> basic_lift \<X> (\<lbrace>\<alpha>\<rbrace> p) (\<lbrace>\<alpha>\<rbrace> q)\<close>
+      by (blast intro: acting_lift)}
+
+    \<^item> Opening case:@{lemma [display]
+      \<open>(\<And>a. \<X> (P a) (Q a)) \<Longrightarrow> basic_lift \<X> (\<lbrace>\<nu> a\<rbrace> P a) (\<lbrace>\<nu> a\<rbrace> Q a)\<close>
+      by (blast intro: opening_lift)}
+
+  \<^noindent> Using \<^const>\<open>basic_lift\<close>, we define the notion of simulation relation for the basic transition
+  system as follows:@{lemma [display, source]
+  "basic.sim \<X> \<longleftrightarrow> (\<forall>p q c. \<X> p q \<and> p \<rightarrow>\<^sub>\<flat> c \<longrightarrow> (\<exists>d. q \<rightarrow>\<^sub>\<flat> d \<and> basic_lift \<X> c d))"
+  by blast}
+
+  For the proper transition system, we can define a lifting operation \<^const>\<open>proper_lift\<close> in an
+  analogous way. Afterwards we can define the notion of simulation relation for the proper
+  transition system in exactly the same way as for the basic transition system, except that we have
+  to replace \<^const>\<open>basic_lift\<close> by \<^const>\<open>proper_lift\<close>.
+
+  This observation suggests a way to build a generic theory of bisimilarity that applies to
+  different transition systems, despite these transition systems using different kinds of residuals:
+  We describe axiomatically what a lifting operation is and construct all definitions and proofs of
+  our theory with reference to an arbitrary lifting operation that fulfills the respective axioms.
+  To instantiate this generic theory for a concrete transition system, we just have to define a
+  concrete lifting operation suitable for the kind of residuals this transition system uses and
+  prove that this lifting operation has the necessary properties.
+
+  Note that this approach not only allows for a common treatment of the basic and the proper
+  transition system but also captures transition systems of other process calculi. In particular, it
+  also works with transition systems that do not allow scope opening, like CCS~@{cite "milner:ccs"},
+  as there is a trivial lifting operation for such systems.
+\<close>
+
 section \<open>Residuals Axiomatically\<close>
 
 subsection \<open>Residuals in General\<close>
