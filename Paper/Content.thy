@@ -44,7 +44,7 @@ subsection \<open>Language\<close>
 
 text \<open>
   We define a coinductive data type \<^type>\<open>process\<close> whose values are the terms of the \<open>\<natural>\<close>-calculus.
-  We call these terms simply ``processes''.
+  We call these terms simply \<^emph>\<open>processes\<close>.
 
   In the following, we list the different kinds of processes. For describing their syntax, we use
   statements of the form \<open>C x\<^sub>1 \<dots> x\<^sub>n \<equiv> e\<close>. The left-hand side of such a statement is an application
@@ -127,7 +127,7 @@ text \<open>
   introduce labels \<^term>\<open>a \<triangleleft> x :: basic_action\<close>, \<^term>\<open>a \<triangleright> x :: proper_action\<close>, and
   \<^term>\<open>\<tau> :: proper_action\<close>, which denote sending of a value~\<^term>\<open>x\<close> to a channel~\<^term>\<open>a\<close>,
   receiving of a value~\<^term>\<open>x\<close> from a channel~\<^term>\<open>a\<close>, and internal communication, respectively,
-  and call these labels ``actions''. Then we introduce the following rules:
+  and call these labels \<^emph>\<open>actions\<close>. Then we introduce the following rules:
 
     \<^item> Sending:@{lemma [display]
       \<open>a \<triangleleft> x \<rightarrow>\<lparr>a \<triangleleft> x\<rparr> \<zero>\<close>
@@ -223,9 +223,9 @@ text \<open>
       transitions. We call this transition system the \<^emph>\<open>proper transition system\<close> and write a
       transition in this system \<^term>\<open>p \<rightarrow>\<^sub>\<sharp>\<lparr>\<xi>\<rparr> q\<close>.
 
-  The basic transition system has action labels \<^term>\<open>a \<triangleleft> x :: basic_action\<close>,
-  \<^term>\<open>a \<triangleright> x :: basic_action\<close>, and \<^term>\<open>\<tau> :: basic_action\<close> as well as opening labels~\<open>\<nu> a\<close>, which
-  bind their variables in any following target process. Its rules for sending, receiving, and
+  The basic transition system has \<^emph>\<open>action labels\<close> \<^term>\<open>a \<triangleleft> x :: basic_action\<close>,
+  \<^term>\<open>a \<triangleright> x :: basic_action\<close>, and \<^term>\<open>\<tau> :: basic_action\<close> as well as \<^emph>\<open>opening labels\<close>~\<open>\<nu> a\<close>,
+  which bind their variables in any following target process. Its rules for sending, receiving, and
   communication are the ones we have seen at the beginning of \hyperref[operational-semantics]{this
   subsection}. For dealing with local channels, the basic transition system contains the following
   rules:
@@ -290,7 +290,7 @@ text \<open>
   contains a binder, the scope of this binder includes any following target process. As a result, we
   can treat neither of the two transition relations as a ternary relation, where source processes,
   labels, and target processes are separate entities. As a solution, we treat the combination of a
-  label and an associated target process as a single entity, which we call a residual. Our
+  label and an associated target process as a single entity, which we call a \<^emph>\<open>residual\<close>. Our
   transition relation then become binary, relating source processes and residuals. This approach has
   been taken in \<open>\<psi>\<close>-calculi, for example.
 
