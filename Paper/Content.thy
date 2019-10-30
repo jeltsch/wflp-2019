@@ -382,22 +382,29 @@ text \<open>
   analogous way. Afterwards we can define the notion of simulation relation for the proper
   transition system in exactly the same way as for the basic transition system, except that we have
   to replace \<^const>\<open>basic_lift\<close> by \<^const>\<open>proper_lift\<close>.
+\<close>
 
-  This observation suggests a way to build a generic theory of bisimilarity that applies to
-  different transition systems, despite these transition systems using different kinds of residuals:
-  We describe axiomatically what a lifting operation is and construct all definitions and proofs of
-  our theory with reference to a lifting operation parameter that fulfills the respective axioms.
-  To instantiate this generic theory for a concrete transition system, we just have to define a
-  concrete lifting operation suitable for the kind of residuals this transition system uses and
-  prove that this lifting operation has the necessary properties.
+section \<open>Residuals Axiomatically\<close>
+
+text \<open>
+  As it stands, we have to develop the theory of bisimilarity separately for the basic and the
+  proper transition system. This means, we have to essentially duplicate definitions of concepts
+  like simulation relation, bisimulation relation, and bisimilarity, and also proofs of various
+  properties of these concepts. The reason is that these two transition systems use different
+  notions of residual and consequently different lifting operations.
+
+  However, we can develop the theory of bisimilarity also generically. We describe axiomatically
+  what a lifting operation is and construct all definitions and proofs of our theory with reference
+  to a lifting operation parameter that fulfills the respective axioms. Whenever we want to support
+  a new notion of residual, we just have to define a concrete lifting operation for it, prove that
+  this lifting operation has the necessary properties, and then apply the theory of bisimilarity to
+  it.
 
   Note that this approach not only allows for a common treatment of the basic and the proper
   transition system but also captures transition systems of other process calculi. In particular, it
   also works with transition systems that do not allow scope opening, like CCS~@{cite "milner:ccs"},
   as there is a trivial lifting operation for such systems.
 \<close>
-
-section \<open>Residuals Axiomatically\<close>
 
 subsection \<open>Residuals in General\<close>
 
