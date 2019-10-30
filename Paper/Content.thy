@@ -174,8 +174,8 @@ text \<open>
   published by sending it to~\<^term>\<open>a\<close>. When used as part of a transition statement, the scope of the
   binder includes the target process, so that the target process can depend on the published
   channel. Therefore, the general form of a transition statement with local channel publication is
-  \<^term>\<open>p \<rightarrow>\<lparr>a \<triangleleft> \<nu> b. \<cent>b\<rparr> Q b\<close>. The \<open>\<pi>\<close>-calculus contains the following rules to deal with local
-  channels:
+  \<^term>\<open>p \<rightarrow>\<lparr>a \<triangleleft> \<nu> b. \<cent>b\<rparr> Q b\<close>. The following rules are HOAS versions of the \<open>\<pi>\<close>-calculus rules that
+  deal with local channels:
 
     \<^item> Scope opening:@{lemma [display]
       \<open>(\<And>b. P b \<rightarrow>\<lparr>a \<triangleleft> \<cent>b\<rparr> Q b) \<Longrightarrow> \<nu> b. P b \<rightarrow>\<lparr>a \<triangleleft> \<nu> b. \<cent>b\<rparr> Q b\<close>
@@ -225,10 +225,10 @@ text \<open>
 
   The basic transition system has \<^emph>\<open>action labels\<close> \<^term>\<open>a \<triangleleft> x :: basic_action\<close>,
   \<^term>\<open>a \<triangleright> x :: basic_action\<close>, and \<^term>\<open>\<tau> :: basic_action\<close> as well as \<^emph>\<open>opening labels\<close>~\<open>\<nu> a\<close>,
-  which bind their variables in any following target process. Its rules for sending, receiving, and
-  communication are the ones we have seen at the beginning of \hyperref[operational-semantics]{this
-  subsection}. For dealing with local channels, the basic transition system contains the following
-  rules:
+  the latter binding their variables in any following target process. The rules for sending,
+  receiving, and communication are the ones we have seen at the beginning of
+  \hyperref[operational-semantics]{this subsection}. For dealing with local channels, the basic
+  transition system contains the following rules:
 
     \<^item> Scope opening:@{lemma [display]
       \<open>\<nu> a. P a \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> a\<rbrace> P a\<close>
@@ -249,8 +249,9 @@ text \<open>
   \<^noindent> The last rule has a symmetric version, which we do not show here for the sake of simplicity.
 
   The proper transition system has labels \<^term>\<open>a \<triangleright> x :: proper_action\<close>, \<^term>\<open>\<tau> :: proper_action\<close>,
-  and \<open>a \<triangleleft> \<nu> b\<^sub>1 \<dots> b\<^sub>n. f b\<^sub>1 \<dots> b\<^sub>n\<close>, which bind their variables also in any following target process.
-  Its rules for sending, receiving, and communication just refer to the basic transition system:
+  and \<open>a \<triangleleft> \<nu> b\<^sub>1 \<dots> b\<^sub>n. f b\<^sub>1 \<dots> b\<^sub>n\<close>, the latter binding their variables also in any following target
+  process. The rules for sending, receiving, and communication just refer to the basic transition
+  system:
 
     \<^item> Sending:@{lemma [display]
       \<open>p \<rightarrow>\<^sub>\<flat>\<lbrace>a \<triangleleft> x\<rbrace> q \<Longrightarrow> p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> x\<rparr> q\<close>
@@ -291,8 +292,8 @@ text \<open>
   can treat neither of the two transition relations as a ternary relation, where source processes,
   labels, and target processes are separate entities. As a solution, we treat the combination of a
   label and an associated target process as a single entity, which we call a \<^emph>\<open>residual\<close>. Our
-  transition relation then become binary, relating source processes and residuals. This approach has
-  been taken in \<open>\<psi>\<close>-calculi, for example.
+  transition relations then become binary, relating source processes and residuals. This approach
+  has been taken in \<open>\<psi>\<close>-calculi, for example.
 
   We define an inductive data type \<^type>\<open>basic_residual\<close> whose values are the residuals of the basic
   transition system. There are two kinds of such residuals:
@@ -336,7 +337,8 @@ text \<open>
       A relation \<^term>\<open>\<X>\<close> for which \<^term>\<open>sim \<X>\<close> holds is called a \<^emph>\<open>simulation relation\<close>.
 
     \<^enum> We define the predicate \<^const>\<open>bisim\<close> on binary relations between process as
-      follows:@{lemma [display, source]
+      follows:\<^footnote>\<open>Note that \<open>_\<inverse>\<inverse>\<close> is Isabelle/HOL syntax for conversion of relations that are
+      represented by binary boolean functions.\<close>@{lemma [display, source]
       "bisim \<X> \<longleftrightarrow> sim \<X> \<and> sim \<X>\<inverse>\<inverse>"
       by (fact refl)}
       A relation \<^term>\<open>\<X>\<close> for which \<^term>\<open>bisim \<X>\<close> holds is called a \<^emph>\<open>bisimulation relation\<close>.
@@ -384,7 +386,7 @@ text \<open>
   This observation suggests a way to build a generic theory of bisimilarity that applies to
   different transition systems, despite these transition systems using different kinds of residuals:
   We describe axiomatically what a lifting operation is and construct all definitions and proofs of
-  our theory with reference to an arbitrary lifting operation that fulfills the respective axioms.
+  our theory with reference to a lifting operation parameter that fulfills the respective axioms.
   To instantiate this generic theory for a concrete transition system, we just have to define a
   concrete lifting operation suitable for the kind of residuals this transition system uses and
   prove that this lifting operation has the necessary properties.
