@@ -316,6 +316,8 @@ text \<open>
 
 subsection \<open>Behavioral Equivalence\<close>
 
+text_raw \<open>\label{behavioral-equivalence}\<close>
+
 context %invisible transition_system begin
 
 (*
@@ -406,6 +408,48 @@ text \<open>
 \<close>
 
 subsection \<open>Residuals in General\<close>
+
+context %invisible residual begin
+
+text \<open>
+  As indicated in Subsection~\ref{behavioral-equivalence}, a lifting operation \<^term>\<open>lift\<close> should
+  generally behave such that \<^term>\<open>lift \<X>\<close> relates two residuals if and only if their labels are the
+  same and their target process are in relation~\<^term>\<open>\<X>\<close>. The axioms for lifting operations should
+  be in line with this behavior and should at the same time be specific enough to allow us to
+  develop the theory of bisimilarity solely based on a lifting operation parameter. It turns out
+  that the following axioms fulfill these requirements:\<^footnote>\<open>Note that \<open>_ OO _\<close> is Isabelle/HOL syntax
+  for composition of relations that are represented by binary boolean functions.\<close>
+
+    \<^item> Equality preservation:@{lemma [display]
+      \<open>lift (=) = (=)\<close>
+      by (fact lift_equality_preservation)}
+
+    \<^item> Composition preservation:@{lemma [display]
+      \<open>lift (\<X> OO \<Y>) = lift \<X> OO lift \<Y>\<close>
+      by (fact lift_composition_preservation)}
+
+    \<^item> Conversion preservation:@{lemma [display]
+      \<open>lift \<X>\<inverse>\<inverse> = (lift \<X>)\<inverse>\<inverse>\<close>
+      by (fact lift_conversion_preservation)}
+
+  The presence of the equality preservation and composition preservation axioms means that lifting
+  operations are functors. However, they are not functors in the Haskell sense. Haskell's functors
+  are specifically endofunctors on the category of types and functions, but lifting operations are
+  endofunctors on the category of types and \<^emph>\<open>relations\<close>.\<^footnote>\<open>The analogy to functors in the Haskell
+  sense can be seen from the fact that replacing \<^term>\<open>lift\<close>, \<^term>\<open>(=)\<close>, and \<^term>\<open>(OO)\<close> in the
+  equality preservation and composition preservation axioms by Haskell's \<^verbatim>\<open>fmap\<close>, \<^verbatim>\<open>id\<close>, and \<^verbatim>\<open>(.)\<close>
+  yields Haskell's functor axioms.\<close>
+
+  With the additional conversion preservation axiom, the axioms for lifting operations are precisely
+  the axioms for \<^emph>\<open>relators\<close>~@{cite \<open>Section~5.1\<close> "bird:aop"}. Therefore, we can say that a lifting
+  operation is just an endorelator on the category of types and relations -- no problem here.
+  Luckily, Isabelle/HOL automatically generates relator-specific constructs for every data type,
+  namely the lifting operation and various facts about it, including the instances of the axioms. As
+  a result, instantiating our theory of bisimilarity to a new notion of residual is extremely
+  simple.
+\<close>
+
+end %invisible
 
 subsection \<open>Weak Residuals\<close>
 
