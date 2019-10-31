@@ -395,10 +395,9 @@ text \<open>
 
   However, we can develop the theory of bisimilarity also generically. We describe axiomatically
   what a lifting operation is and construct all definitions and proofs of our theory with reference
-  to a lifting operation parameter that fulfills the respective axioms. Whenever we want to support
-  a new notion of residual, we just have to define a concrete lifting operation for it, prove that
-  this lifting operation has the necessary properties, and then apply the theory of bisimilarity to
-  it.
+  to a lifting operation parameter that fulfills the respective axioms. Whenever we want our theory
+  to support a new notion of residual, we just have to define a concrete lifting operation for it
+  and prove that this lifting operation has the necessary properties.
 
   Note that this approach not only allows for a common treatment of the basic and the proper
   transition system but also captures transition systems of other process calculi. In particular, it
