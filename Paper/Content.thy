@@ -448,8 +448,8 @@ text \<open>
   yields Haskell's functor axioms.\<close>
 
   With the additional conversion preservation axiom, the axioms for lifting operations are precisely
-  the axioms for \<^emph>\<open>relators\<close>~@{cite \<open>Section~5.1\<close> "bird:aop"}. Therefore, we can say that a lifting
-  operation is just an endorelator on the category of types and relations -- no problem here.
+  the axioms for \<^emph>\<open>relators\<close>~@{cite \<open>Section~5.1\<close> "bird:aop"}. Therefore, we can say that a residual
+  structure is just an endorelator on the category of types and relations -- no problem here.
   Luckily, Isabelle/HOL automatically generates relator-specific constructs for every data type,
   namely the lifting operation and various facts about it, including the instances of the axioms. As
   a result, instantiating our theory of bisimilarity to a new notion of residual is extremely
