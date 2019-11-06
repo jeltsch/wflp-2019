@@ -1,5 +1,5 @@
 theory %invisible Content
-  imports Chi_Calculus.Proper_Transition_System
+  imports Chi_Calculus.Proper_Weak_Transition_System
 begin
 
 section \<open>Introduction\<close>
@@ -459,6 +459,261 @@ text \<open>
 end %invisible
 
 subsection \<open>Weak Residuals\<close>
+
+text_raw \<open>\label{weak-residuals}\<close>
+
+no_notation %invisible proper_transition ("_ \<rightarrow>\<^sub>\<sharp>_" [51, 51] 50)
+notation %invisible proper_transition ("_ \<rightarrow>_" [51, 51] 50)
+
+no_notation %invisible proper.weak_transition (infix "\<Rightarrow>\<^sub>\<sharp>" 50)
+notation %invisible proper.weak_transition ("_ \<Rightarrow>_" [51, 51] 50)
+
+abbreviation %invisible
+  silent_transition_closure :: "process \<Rightarrow> process \<Rightarrow> bool"
+  (infix "\<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>*" 50)
+where
+  "(\<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>*) \<equiv> (\<lambda>s t. s \<rightarrow>\<lparr>\<tau>\<rparr> t)\<^sup>*\<^sup>*"
+
+lemma %invisible silent_weak_transition_def:
+  shows "p \<Rightarrow>\<lparr>\<tau>\<rparr> q \<longleftrightarrow> p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+proof
+  assume "p \<Rightarrow>\<lparr>\<tau>\<rparr> q"
+  then show "p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+  proof (induction p "\<lparr>\<tau>\<rparr> q" arbitrary: q)
+    case strong_transition
+    then show ?case
+      by (fact r_into_rtranclp)
+  next
+    case silent_transition
+    then show ?case
+      by (blast elim: proper_silent.cases)
+  next
+    case (composed_transition p _ q)
+    then obtain u where "p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* u" and "u \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+      by (blast elim: proper_silent.cases proper_lift_cases)
+    then show ?case
+      by (fact rtranclp_trans)
+  qed
+next
+  assume "p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+  then show "p \<Rightarrow>\<lparr>\<tau>\<rparr> q"
+  proof induction
+    case base
+    then show ?case
+      by (blast intro: proper_internal_is_silent proper.silent_transition)
+  next
+    case step
+    then show ?case
+      by (blast intro:
+        proper.strong_transition
+        proper_internal_is_silent
+        proper.composed_transition)
+  qed
+qed
+
+lemma %invisible observable_weak_transition_def:
+  fixes \<xi> :: proper_action
+  assumes "\<xi> \<noteq> \<tau>"
+  shows "p \<Rightarrow>\<lparr>\<xi>\<rparr> q \<longleftrightarrow> (\<exists>s t. p \<Rightarrow>\<lparr>\<tau>\<rparr> s \<and> s \<rightarrow>\<lparr>\<xi>\<rparr> t \<and> t \<Rightarrow>\<lparr>\<tau>\<rparr> q)"
+proof
+  assume "p \<Rightarrow>\<lparr>\<xi>\<rparr> q"
+  then show "\<exists>s t. p \<Rightarrow>\<lparr>\<tau>\<rparr> s \<and> s \<rightarrow>\<lparr>\<xi>\<rparr> t \<and> t \<Rightarrow>\<lparr>\<tau>\<rparr> q"
+  proof (induction p "\<lparr>\<xi>\<rparr> q" arbitrary: q)
+    case strong_transition
+    then show ?case
+      by (blast intro: proper_internal_is_silent proper.silent_transition)
+  next
+    case silent_transition
+    with \<open>\<xi> \<noteq> \<tau>\<close> show ?case
+      by (blast elim: proper_silent.cases)
+  next
+    case (composed_transition p _ q)
+    then consider
+      u and s and t where "p \<Rightarrow>\<lparr>\<tau>\<rparr> u" and "u \<Rightarrow>\<lparr>\<tau>\<rparr> s" and "s \<rightarrow>\<lparr>\<xi>\<rparr> t" and "t \<Rightarrow>\<lparr>\<tau>\<rparr> q" |
+      s and t and u where "p \<Rightarrow>\<lparr>\<tau>\<rparr> s" and "s \<rightarrow>\<lparr>\<xi>\<rparr> t" and "t \<Rightarrow>\<lparr>\<tau>\<rparr> u" and "u \<Rightarrow> \<lparr>\<tau>\<rparr> q"
+      by (blast elim: proper_silent.cases proper_lift_cases)
+    then show ?case
+      by cases (blast intro: proper_internal_is_silent proper.composed_transition)+
+  qed
+next
+  assume "\<exists>s t. p \<Rightarrow>\<lparr>\<tau>\<rparr> s \<and> s \<rightarrow>\<lparr>\<xi>\<rparr> t \<and> t \<Rightarrow>\<lparr>\<tau>\<rparr> q"
+  then show "p \<Rightarrow>\<lparr>\<xi>\<rparr> q"
+    by (fastforce intro:
+      proper_internal_is_silent
+      proper.strong_transition
+      proper.composed_transition)
+qed
+
+text \<open>
+  Our axiomatic treatment of lifting operations allows us to handle ordinary bisimilarity, which is
+  also known as \<^emph>\<open>strong bisimilarity\<close>. In practice, however, we are more interested in \<^emph>\<open>weak
+  bisimilarity\<close>. Weak bisimilarity cares only about \<^emph>\<open>observable\<close> behavior; it treats internal
+  communication as silent and ignores it.
+
+  Normally, weak bisimilarity can be elegantly defined as the bisimilarity of the \<^emph>\<open>weak transition
+  relation\<close>~\<open>(\<Rightarrow>)\<close>, which is derived from the original transition relation~\<open>(\<rightarrow>)\<close> using the
+  following equivalences:\<^footnote>\<open>The notation \<open>_ \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* _\<close> stands for the reflexive and transitive closure
+  of \<open>_ \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* _\<close>.\<close>
+
+    \<^item> Silent:@{lemma [display, source]
+      "p \<Rightarrow>\<lparr>\<tau>\<rparr> q \<longleftrightarrow> p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+      by (fact silent_weak_transition_def)}
+
+    \<^item> Observable:@{lemma [display, source]
+      "\<xi> \<noteq> \<tau> \<Longrightarrow> p \<Rightarrow>\<lparr>\<xi>\<rparr> q \<longleftrightarrow> (\<exists>s t. p \<Rightarrow>\<lparr>\<tau>\<rparr> s \<and> s \<rightarrow>\<lparr>\<xi>\<rparr> t \<and> t \<Rightarrow>\<lparr>\<tau>\<rparr> q)"
+      by (fact observable_weak_transition_def)}
+
+  Unfortunately, the above definition of~\<open>(\<Rightarrow>)\<close> refers to a dedicated silent label and thus cannot
+  be applied to our setting, where we treat residuals as black boxes. To resolve this issue, we
+  modify the definition of~\<open>(\<Rightarrow>)\<close> such that it is based on two relations that together identify
+  silence. We define these relations differently for different notions of residual but specify their
+  general properties by a set of axioms.
+\<close>
+
+definition %invisible
+  basic_fuse :: "'p basic_residual basic_residual \<Rightarrow> 'p basic_residual \<Rightarrow> bool"
+where
+  "basic_fuse = basic_silent\<inverse>\<inverse> \<squnion> basic_lift basic_silent\<inverse>\<inverse>"
+
+(* A version of \<^theory_text>\<open>basic.silent_converse_naturality\<close> with a more general type *)
+lemma %invisible basic_silent_converse_naturality:
+  shows "basic_silent\<inverse>\<inverse> OO \<X> = basic_lift \<X> OO basic_silent\<inverse>\<inverse>"
+  by (blast
+    elim: basic_silent.cases basic_lift_cases
+    intro: basic_internal_is_silent basic_lift_intros)
+
+lemma %invisible basic_absorb_from_fuse:
+  shows "basic.absorb \<I> = basic_lift \<I> OO basic_fuse"
+  unfolding basic_fuse_def
+  by (simp add: basic_silent_converse_naturality basic_residual.rel_compp)
+
+text \<open>
+  The first of the relations that identify silence relates each process with the residual that
+  extends this process with the silent label. For \<^type>\<open>basic_residual\<close>, we define this relation
+  inductively using the following rule:@{lemma [display]
+  \<open>basic_silent p (\<lbrace>\<tau>\<rbrace> p)\<close>
+  by (fact basic_internal_is_silent)}
+  For \<^type>\<open>proper_residual\<close> and other residual type constructors, we can define the corresponding
+  relation in an analogous way.
+
+  The second of the relations that identify silence relates each nested residual that contains the
+  silent label at least once with the ordinary residual that is obtained by dropping this label. For
+  \<^type>\<open>basic_residual\<close>, we define this relation inductively using the following rules:
+
+    \<^item> Silent--acting case:@{lemma [display, source]
+      "basic_fuse (\<lbrace>\<tau>\<rbrace>\<lbrace>\<alpha>\<rbrace> p) (\<lbrace>\<alpha>\<rbrace> p)"
+      by (unfold basic_fuse_def, blast intro: basic_internal_is_silent)}
+
+    \<^item> Silent--opening case:@{lemma [display, source]
+      "basic_fuse (\<lbrace>\<tau>\<rbrace>\<lbrace>\<nu> a\<rbrace> P a) (\<lbrace>\<nu> a\<rbrace> P a)"
+      by (unfold basic_fuse_def, blast intro: basic_internal_is_silent)}
+
+    \<^item> Acting--silent case:@{lemma [display, source]
+      "basic_fuse (\<lbrace>\<alpha>\<rbrace>\<lbrace>\<tau>\<rbrace> p) (\<lbrace>\<alpha>\<rbrace> p)"
+      by (unfold basic_fuse_def, blast intro: basic_internal_is_silent basic_lift_intros)}
+
+    \<^item> Opening--silent case:@{lemma [display, source]
+      "basic_fuse (\<lbrace>\<nu> a\<rbrace>\<lbrace>\<tau>\<rbrace> P a) (\<lbrace>\<nu> a\<rbrace> P a)"
+      by (unfold basic_fuse_def, blast intro: basic_internal_is_silent basic_lift_intros)}
+
+  \<^noindent> For \<^type>\<open>proper_residual\<close> and other residual type constructors, we can define the corresponding
+  relation in an analogous way.
+\<close>
+
+(*
+  From now on, we work with seemingly generic functions \<open>(\<rightarrow>)\<close>, \<open>lift\<close>, \<open>silent\<close>, and \<open>fuse\<close> that
+  are in fact the concrete entities for the basic transition system. The reasons are as follows:
+
+    \<^item> There cannot be a generic \<open>fuse\<close> (because Isabelle does not support higher-kinded types).
+
+    \<^item> As a consequence of the former, there cannot be generic proofs involving \<open>fuse\<close> (we conduct
+      the proofs for the basic transition instead, which gives us at least \<^emph>\<open>some\<close> assurance.
+*)
+
+no_notation %invisible proper_transition ("_ \<rightarrow>_" [51, 51] 50)
+
+no_notation %invisible proper.weak_transition ("_ \<Rightarrow>_" [51, 51] 50)
+
+notation %invisible basic_transition (infix "\<rightarrow>" 50)
+
+notation %invisible basic.weak_transition (infix "\<Rightarrow>" 50)
+
+notation %invisible basic_lift ("lift")
+
+notation %invisible basic_silent ("silent")
+
+notation %invisible basic_fuse ("fuse")
+
+text \<open>
+  We define the weak transition relation~\<^term>\<open>(\<Rightarrow>)\<close> of a given transition relation~\<^term>\<open>(\<rightarrow>)\<close>
+  generically based on two parameters \<^term>\<open>silent\<close> and \<^term>\<open>fuse\<close>. The definition of~\<^term>\<open>(\<Rightarrow>)\<close> is
+  inductive, using the following rules:
+
+    \<^item> Strong transitions:@{lemma [display]
+      \<open>p \<rightarrow> c \<Longrightarrow> p \<Rightarrow> c\<close>
+      by (fact basic.strong_transition)}
+
+    \<^item> Empty transitions:@{lemma [display]
+      \<open>silent p c \<Longrightarrow> p \<Rightarrow> c\<close>
+      by (fact basic.silent_transition)}
+
+    \<^item> Compound transitions:@{lemma [display]
+      \<open>\<lbrakk>p \<Rightarrow> c; lift (\<Rightarrow>) c z; fuse z d\<rbrakk> \<Longrightarrow> p \<Rightarrow> d\<close>
+      by (rule basic.composed_transition, auto simp add: basic_absorb_from_fuse)}
+
+  As indicated above, the behavior of \<^term>\<open>silent\<close> and \<^term>\<open>fuse\<close> should generally be such that
+  \<^term>\<open>silent\<close> adds a silent label to a process and \<^term>\<open>fuse\<close> removes a silent label from a nested
+  residual. The following axioms are in line with this behavior and are at the same time specific
+  enough to allow us to develop the theory of weak bisimilarity solely based on the \<^term>\<open>silent\<close>
+  and \<^term>\<open>fuse\<close> parameters:
+
+    \<^item> Left-neutrality:@{lemma [display]
+      \<open>silent OO fuse = (=)\<close>
+      by (
+        unfold basic_fuse_def,
+        blast elim: basic_silent.cases basic_lift_cases intro: basic_internal_is_silent
+      )}
+
+    \<^item> Right-neutrality:@{lemma [display]
+      \<open>lift silent OO fuse = (=)\<close>
+      by (fold basic_absorb_from_fuse, fact basic.right_neutrality)}
+
+    \<^item> Associativity:@{lemma [display]
+      \<open>fuse OO fuse = lift fuse OO fuse\<close>
+      by (
+        unfold basic_fuse_def,
+        simp add:
+          basic_residual.rel_compp [symmetric]
+          basic_silent_converse_naturality [symmetric]
+          sup_assoc
+          sup_commute
+          sup_left_commute
+      )}
+
+  The above axioms are precisely the axioms for monads.\<^footnote>\<open>The analogy to monads in the Haskell sense
+  can be seen from the fact that replacing \<^term>\<open>lift\<close>,\<^term>\<open>silent\<close>, \<^term>\<open>fuse\<close>, \<^term>\<open>(=)\<close>, and
+  \<^term>\<open>(OO)\<close> in these axioms by Haskell's \<^verbatim>\<open>fmap\<close>, \<^verbatim>\<open>return\<close>, \<^verbatim>\<open>join\<close>, \<^verbatim>\<open>id\<close>, and \<^verbatim>\<open>(.)\<close> yields
+  Haskell's \<^verbatim>\<open>join\<close>-based monad axioms.\<close> Therefore, we can say that a weak residual structure is
+  just a monad in the category of types and relations -- a completely unproblematic specification.
+
+  The monadic approach to weak residuals is actually very general. It does not only allow for a
+  common treatment of residuals with different scope opening patters but also makes non-standard
+  notions of silence possible, for example, by allowing multiple silent labels. Despite this
+  generality, typical properties of weak bisimilarity can be proved generically. Concretely, we have
+  developed formal proofs of the following statements:
+
+    \<^item> Weak bisimilarity is the same as ``mixed'' bisimilarity, a notion of bisimilarity where
+      ordinary transitions are simulated by weak transitions.
+
+    \<^item> Strong bisimilarity is a subrelation of weak bisimilarity.
+
+  Furthermore, the generic definition of the weak transition relation~\<^term>\<open>(\<Rightarrow>)\<close> is simpler than
+  the traditional definition shown at the beginning of \hyperref[weak-residuals]{this subsection} in
+  that it does not distinguish between silent and observable transitions; this distinction is pushed
+  into the definitions of the \<^term>\<open>silent\<close> and \<^term>\<open>fuse\<close> relations of the individual notions of
+  weak residual. The simple structure of the definition of~\<^term>\<open>(\<Rightarrow>)\<close> encourages a simple structure
+  of generic proofs about weak transitions.
+\<close>
 
 subsection \<open>Normal Weak Residuals\<close>
 
