@@ -295,8 +295,8 @@ text \<open>
   transition relations then become binary, relating source processes and residuals. This approach
   has been taken in \<open>\<psi>\<close>-calculi, for example.
 
-  We define an inductive data type \<^type>\<open>basic_residual\<close> whose values are the residuals of the basic
-  transition system. There are two kinds of such residuals:
+  We define an inductive data type whose values are the residuals of the basic transition system.
+  There are two kinds of such residuals:
 
     \<^item> Acting:@{lemma [display, source]
       "Acting \<alpha> p \<equiv> \<lbrace>\<alpha>\<rbrace> p"
@@ -308,9 +308,16 @@ text \<open>
 
   \<^noindent> Note that in the \<open>Opening\<close> case we use HOAS and binder notation again.
 
-  We also introduce an analogous data type \<^type>\<open>proper_residual\<close> for the proper transition system.
-  The definition of \<^type>\<open>proper_residual\<close> is considerably more complex than the definition of
-  \<^type>\<open>basic_residual\<close>, which is why we do not show it here. However, its general approach to
+  Actually we do not just define a single data type for residuals but a type constructor
+  \<^type>\<open>basic_residual\<close> that is parametrized  by the type of the target. As a result, terms
+  \<^term>\<open>\<lbrace>\<xi>\<rbrace> e\<close> can be formed from terms \<^term>\<open>e\<close> of any type~\<^term>\<open>\<alpha>\<close>, with the resulting type being
+  \<open>\<alpha> basic_residual\<close>. This permits us to construct \<^emph>\<open>nested residuals\<close>, residuals with two labels,
+  which have type \<^typ>\<open>process basic_residual basic_residual\<close>. Nested residuals will play a role in
+  Subsection~\ref{weak-residuals}.
+
+  We also introduce an analogous type constructor \<^type>\<open>proper_residual\<close> for the proper transition
+  system. The definition of \<^type>\<open>proper_residual\<close> is considerably more complex than the definition
+  of \<^type>\<open>basic_residual\<close>, which is why we do not show it here. However, its general approach to
   capturing scope opening is the same.
 \<close>
 
