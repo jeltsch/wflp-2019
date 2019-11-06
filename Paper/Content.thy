@@ -398,7 +398,7 @@ section \<open>Residuals Axiomatically\<close>
 text \<open>
   As it stands, we have to develop the theory of bisimilarity separately for the basic and the
   proper transition system. This means, we have to essentially duplicate definitions of concepts
-  like simulation relation, bisimulation relation, and bisimilarity, and also proofs of various
+  like simulation relation, bisimulation relation, and bisimilarity and also proofs of various
   properties of these concepts. The reason is that these two transition systems use different
   notions of residual and consequently different lifting operations.
 
