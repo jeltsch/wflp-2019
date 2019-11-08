@@ -1,5 +1,5 @@
 theory %invisible Content
-  imports Chi_Calculus.Proper_Transition_System
+  imports Chi_Calculus.Proper_Weak_Transition_System
 begin
 
 section \<open>Introduction\<close>
@@ -323,6 +323,8 @@ text \<open>
 
 subsection \<open>Behavioral Equivalence\<close>
 
+text_raw \<open>\label{behavioral-equivalence}\<close>
+
 context %invisible transition_system begin
 
 (*
@@ -389,14 +391,22 @@ text \<open>
   analogous way. Afterwards we can define the notion of simulation relation for the proper
   transition system in exactly the same way as for the basic transition system, except that we have
   to replace \<^const>\<open>basic_lift\<close> by \<^const>\<open>proper_lift\<close>.
+\<close>
 
-  This observation suggests a way to build a generic theory of bisimilarity that applies to
-  different transition systems, despite these transition systems using different kinds of residuals:
-  We describe axiomatically what a lifting operation is and construct all definitions and proofs of
-  our theory with reference to a lifting operation parameter that fulfills the respective axioms.
-  To instantiate this generic theory for a concrete transition system, we just have to define a
-  concrete lifting operation suitable for the kind of residuals this transition system uses and
-  prove that this lifting operation has the necessary properties.
+section \<open>Residuals Axiomatically\<close>
+
+text \<open>
+  As it stands, we have to develop the theory of bisimilarity separately for the basic and the
+  proper transition system. This means, we have to essentially duplicate definitions of concepts
+  like simulation relation, bisimulation relation, and bisimilarity and also proofs of various
+  properties of these concepts. The reason is that these two transition systems use different
+  notions of residual and consequently different lifting operations.
+
+  However, we can develop the theory of bisimilarity also generically. We describe axiomatically
+  what a lifting operation is and construct all definitions and proofs of our theory with reference
+  to a lifting operation parameter that fulfills the respective axioms. Whenever we want our theory
+  to support a new notion of residual, we just have to define a concrete lifting operation for it
+  and prove that this lifting operation has the necessary properties.
 
   Note that this approach not only allows for a common treatment of the basic and the proper
   transition system but also captures transition systems of other process calculi. In particular, it
@@ -404,13 +414,365 @@ text \<open>
   as there is a trivial lifting operation for such systems.
 \<close>
 
-section \<open>Residuals Axiomatically\<close>
-
 subsection \<open>Residuals in General\<close>
+
+context %invisible residual begin
+
+text \<open>
+  As indicated in Subsection~\ref{behavioral-equivalence}, a lifting operation \<^term>\<open>lift\<close> should
+  generally behave such that \<^term>\<open>lift \<X>\<close> relates two residuals if and only if their labels are the
+  same and their target process are in relation~\<^term>\<open>\<X>\<close>. The axioms for lifting operations should
+  be in line with this behavior and should at the same time be specific enough to allow us to
+  develop the theory of bisimilarity solely based on a lifting operation parameter. It turns out
+  that the following axioms fulfill these requirements:\<^footnote>\<open>Note that \<open>_ OO _\<close> is Isabelle/HOL syntax
+  for composition of relations that are represented by binary boolean functions.\<close>
+
+    \<^item> Equality preservation:@{lemma [display]
+      \<open>lift (=) = (=)\<close>
+      by (fact lift_equality_preservation)}
+
+    \<^item> Composition preservation:@{lemma [display]
+      \<open>lift (\<X> OO \<Y>) = lift \<X> OO lift \<Y>\<close>
+      by (fact lift_composition_preservation)}
+
+    \<^item> Conversion preservation:@{lemma [display]
+      \<open>lift \<X>\<inverse>\<inverse> = (lift \<X>)\<inverse>\<inverse>\<close>
+      by (fact lift_conversion_preservation)}
+
+  The presence of the equality preservation and composition preservation axioms means that lifting
+  operations are functors. However, they are not functors in the Haskell sense. Haskell's functors
+  are specifically endofunctors on the category of types and functions, but lifting operations are
+  endofunctors on the category of types and \<^emph>\<open>relations\<close>.\<^footnote>\<open>The analogy to functors in the Haskell
+  sense can be seen from the fact that replacing \<^term>\<open>lift\<close>, \<^term>\<open>(=)\<close>, and \<^term>\<open>(OO)\<close> in the
+  equality preservation and composition preservation axioms by Haskell's \<^verbatim>\<open>fmap\<close>, \<^verbatim>\<open>id\<close>, and \<^verbatim>\<open>(.)\<close>
+  yields Haskell's functor axioms.\<close>
+
+  With the additional conversion preservation axiom, the axioms for lifting operations are precisely
+  the axioms for \<^emph>\<open>relators\<close>~@{cite \<open>Section~5.1\<close> "bird:aop"}. Therefore, we can say that a residual
+  structure is just an endorelator on the category of types and relations -- no problem here.
+  Luckily, Isabelle/HOL automatically generates relator-specific constructs for every data type,
+  namely the lifting operation and various facts about it, including the instances of the axioms. As
+  a result, instantiating our theory of bisimilarity to a new notion of residual is extremely
+  simple.
+\<close>
+
+end %invisible
 
 subsection \<open>Weak Residuals\<close>
 
+text_raw \<open>\label{weak-residuals}\<close>
+
+no_notation %invisible proper_transition ("_ \<rightarrow>\<^sub>\<sharp>_" [51, 51] 50)
+notation %invisible proper_transition ("_ \<rightarrow>_" [51, 51] 50)
+
+no_notation %invisible proper.weak_transition (infix "\<Rightarrow>\<^sub>\<sharp>" 50)
+notation %invisible proper.weak_transition ("_ \<Rightarrow>_" [51, 51] 50)
+
+abbreviation %invisible
+  silent_transition_closure :: "process \<Rightarrow> process \<Rightarrow> bool"
+  (infix "\<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>*" 50)
+where
+  "(\<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>*) \<equiv> (\<lambda>s t. s \<rightarrow>\<lparr>\<tau>\<rparr> t)\<^sup>*\<^sup>*"
+
+lemma %invisible silent_weak_transition_def:
+  shows "p \<Rightarrow>\<lparr>\<tau>\<rparr> q \<longleftrightarrow> p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+proof
+  assume "p \<Rightarrow>\<lparr>\<tau>\<rparr> q"
+  then show "p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+  proof (induction p "\<lparr>\<tau>\<rparr> q" arbitrary: q)
+    case strong_transition
+    then show ?case
+      by (fact r_into_rtranclp)
+  next
+    case silent_transition
+    then show ?case
+      by (blast elim: proper_silent.cases)
+  next
+    case (composed_transition p _ q)
+    then obtain u where "p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* u" and "u \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+      by (blast elim: proper_silent.cases proper_lift_cases)
+    then show ?case
+      by (fact rtranclp_trans)
+  qed
+next
+  assume "p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+  then show "p \<Rightarrow>\<lparr>\<tau>\<rparr> q"
+  proof induction
+    case base
+    then show ?case
+      by (blast intro: proper_internal_is_silent proper.silent_transition)
+  next
+    case step
+    then show ?case
+      by (blast intro:
+        proper.strong_transition
+        proper_internal_is_silent
+        proper.composed_transition)
+  qed
+qed
+
+lemma %invisible observable_weak_transition_def:
+  fixes \<xi> :: proper_action
+  assumes "\<xi> \<noteq> \<tau>"
+  shows "p \<Rightarrow>\<lparr>\<xi>\<rparr> q \<longleftrightarrow> (\<exists>s t. p \<Rightarrow>\<lparr>\<tau>\<rparr> s \<and> s \<rightarrow>\<lparr>\<xi>\<rparr> t \<and> t \<Rightarrow>\<lparr>\<tau>\<rparr> q)"
+proof
+  assume "p \<Rightarrow>\<lparr>\<xi>\<rparr> q"
+  then show "\<exists>s t. p \<Rightarrow>\<lparr>\<tau>\<rparr> s \<and> s \<rightarrow>\<lparr>\<xi>\<rparr> t \<and> t \<Rightarrow>\<lparr>\<tau>\<rparr> q"
+  proof (induction p "\<lparr>\<xi>\<rparr> q" arbitrary: q)
+    case strong_transition
+    then show ?case
+      by (blast intro: proper_internal_is_silent proper.silent_transition)
+  next
+    case silent_transition
+    with \<open>\<xi> \<noteq> \<tau>\<close> show ?case
+      by (blast elim: proper_silent.cases)
+  next
+    case (composed_transition p _ q)
+    then consider
+      u and s and t where "p \<Rightarrow>\<lparr>\<tau>\<rparr> u" and "u \<Rightarrow>\<lparr>\<tau>\<rparr> s" and "s \<rightarrow>\<lparr>\<xi>\<rparr> t" and "t \<Rightarrow>\<lparr>\<tau>\<rparr> q" |
+      s and t and u where "p \<Rightarrow>\<lparr>\<tau>\<rparr> s" and "s \<rightarrow>\<lparr>\<xi>\<rparr> t" and "t \<Rightarrow>\<lparr>\<tau>\<rparr> u" and "u \<Rightarrow> \<lparr>\<tau>\<rparr> q"
+      by (blast elim: proper_silent.cases proper_lift_cases)
+    then show ?case
+      by cases (blast intro: proper_internal_is_silent proper.composed_transition)+
+  qed
+next
+  assume "\<exists>s t. p \<Rightarrow>\<lparr>\<tau>\<rparr> s \<and> s \<rightarrow>\<lparr>\<xi>\<rparr> t \<and> t \<Rightarrow>\<lparr>\<tau>\<rparr> q"
+  then show "p \<Rightarrow>\<lparr>\<xi>\<rparr> q"
+    by (fastforce intro:
+      proper_internal_is_silent
+      proper.strong_transition
+      proper.composed_transition)
+qed
+
+text \<open>
+  Our axiomatic treatment of lifting operations allows us to handle ordinary bisimilarity, which is
+  also known as \<^emph>\<open>strong bisimilarity\<close>. In practice, however, we are more interested in \<^emph>\<open>weak
+  bisimilarity\<close>. Weak bisimilarity cares only about \<^emph>\<open>observable\<close> behavior; it treats internal
+  communication as silent and ignores it.
+
+  Normally, weak bisimilarity can be elegantly defined as the bisimilarity of the \<^emph>\<open>weak transition
+  relation\<close>~\<open>(\<Rightarrow>)\<close>, which is derived from the original transition relation~\<open>(\<rightarrow>)\<close> using the
+  following equivalences:\<^footnote>\<open>The notation \<open>_ \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* _\<close> stands for the reflexive and transitive closure
+  of \<open>_ \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* _\<close>.\<close>
+
+    \<^item> Silent:@{lemma [display, source]
+      "p \<Rightarrow>\<lparr>\<tau>\<rparr> q \<longleftrightarrow> p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
+      by (fact silent_weak_transition_def)}
+
+    \<^item> Observable:@{lemma [display, source]
+      "\<xi> \<noteq> \<tau> \<Longrightarrow> p \<Rightarrow>\<lparr>\<xi>\<rparr> q \<longleftrightarrow> (\<exists>s t. p \<Rightarrow>\<lparr>\<tau>\<rparr> s \<and> s \<rightarrow>\<lparr>\<xi>\<rparr> t \<and> t \<Rightarrow>\<lparr>\<tau>\<rparr> q)"
+      by (fact observable_weak_transition_def)}
+
+  Unfortunately, the above definition of~\<open>(\<Rightarrow>)\<close> refers to a dedicated silent label and thus cannot
+  be applied to our setting, where we treat residuals as black boxes. To resolve this issue, we
+  modify the definition of~\<open>(\<Rightarrow>)\<close> such that it is based on two relations that together identify
+  silence. We define these relations differently for different notions of residual but specify their
+  general properties by a set of axioms.
+\<close>
+
+definition %invisible
+  basic_fuse :: "'p basic_residual basic_residual \<Rightarrow> 'p basic_residual \<Rightarrow> bool"
+where
+  "basic_fuse = basic_silent\<inverse>\<inverse> \<squnion> basic_lift basic_silent\<inverse>\<inverse>"
+
+(* A version of \<^theory_text>\<open>basic.silent_converse_naturality\<close> with a more general type *)
+lemma %invisible basic_silent_converse_naturality:
+  shows "basic_silent\<inverse>\<inverse> OO \<X> = basic_lift \<X> OO basic_silent\<inverse>\<inverse>"
+  by (blast
+    elim: basic_silent.cases basic_lift_cases
+    intro: basic_internal_is_silent basic_lift_intros)
+
+lemma %invisible basic_absorb_from_fuse:
+  shows "basic.absorb \<I> = basic_lift \<I> OO basic_fuse"
+  unfolding basic_fuse_def
+  by (simp add: basic_silent_converse_naturality basic_residual.rel_compp)
+
+text \<open>
+  The first of the relations that identify silence relates each process with the residual that
+  extends this process with the silent label. For \<^type>\<open>basic_residual\<close>, we define this relation
+  inductively using the following rule:@{lemma [display]
+  \<open>basic_silent p (\<lbrace>\<tau>\<rbrace> p)\<close>
+  by (fact basic_internal_is_silent)}
+  For \<^type>\<open>proper_residual\<close> and other residual type constructors, we can define the corresponding
+  relation in an analogous way.
+
+  The second of the relations that identify silence relates each nested residual that contains the
+  silent label at least once with the ordinary residual that is obtained by dropping this label. For
+  \<^type>\<open>basic_residual\<close>, we define this relation inductively using the following rules:
+
+    \<^item> Silent--acting case:@{lemma [display, source]
+      "basic_fuse (\<lbrace>\<tau>\<rbrace>\<lbrace>\<alpha>\<rbrace> p) (\<lbrace>\<alpha>\<rbrace> p)"
+      by (unfold basic_fuse_def, blast intro: basic_internal_is_silent)}
+
+    \<^item> Silent--opening case:@{lemma [display, source]
+      "basic_fuse (\<lbrace>\<tau>\<rbrace>\<lbrace>\<nu> a\<rbrace> P a) (\<lbrace>\<nu> a\<rbrace> P a)"
+      by (unfold basic_fuse_def, blast intro: basic_internal_is_silent)}
+
+    \<^item> Acting--silent case:@{lemma [display, source]
+      "basic_fuse (\<lbrace>\<alpha>\<rbrace>\<lbrace>\<tau>\<rbrace> p) (\<lbrace>\<alpha>\<rbrace> p)"
+      by (unfold basic_fuse_def, blast intro: basic_internal_is_silent basic_lift_intros)}
+
+    \<^item> Opening--silent case:@{lemma [display, source]
+      "basic_fuse (\<lbrace>\<nu> a\<rbrace>\<lbrace>\<tau>\<rbrace> P a) (\<lbrace>\<nu> a\<rbrace> P a)"
+      by (unfold basic_fuse_def, blast intro: basic_internal_is_silent basic_lift_intros)}
+
+  \<^noindent> For \<^type>\<open>proper_residual\<close> and other residual type constructors, we can define the corresponding
+  relation in an analogous way.
+\<close>
+
+(*
+  From now on, we work with seemingly generic functions \<open>(\<rightarrow>)\<close>, \<open>lift\<close>, \<open>silent\<close>, and \<open>fuse\<close> that
+  are in fact the concrete entities for the basic transition system. The reasons are as follows:
+
+    \<^item> There cannot be a generic \<open>fuse\<close> (because Isabelle does not support higher-kinded types).
+
+    \<^item> As a consequence of the former, there cannot be generic proofs involving \<open>fuse\<close> (we conduct
+      the proofs for the basic transition instead, which gives us at least \<^emph>\<open>some\<close> assurance.
+*)
+
+no_notation %invisible proper_transition ("_ \<rightarrow>_" [51, 51] 50)
+
+no_notation %invisible proper.weak_transition ("_ \<Rightarrow>_" [51, 51] 50)
+
+notation %invisible basic_transition (infix "\<rightarrow>" 50)
+
+notation %invisible basic.weak_transition (infix "\<Rightarrow>" 50)
+
+notation %invisible basic_lift ("lift")
+
+notation %invisible basic_silent ("silent")
+
+notation %invisible basic_fuse ("fuse")
+
+text \<open>
+  We define the weak transition relation~\<^term>\<open>(\<Rightarrow>)\<close> of a given transition relation~\<^term>\<open>(\<rightarrow>)\<close>
+  generically based on two parameters \<^term>\<open>silent\<close> and \<^term>\<open>fuse\<close>. The definition of~\<^term>\<open>(\<Rightarrow>)\<close> is
+  inductive, using the following rules:
+
+    \<^item> Strong transitions:@{lemma [display]
+      \<open>p \<rightarrow> c \<Longrightarrow> p \<Rightarrow> c\<close>
+      by (fact basic.strong_transition)}
+
+    \<^item> Empty transitions:@{lemma [display]
+      \<open>silent p c \<Longrightarrow> p \<Rightarrow> c\<close>
+      by (fact basic.silent_transition)}
+
+    \<^item> Compound transitions:@{lemma [display]
+      \<open>\<lbrakk>p \<Rightarrow> c; lift (\<Rightarrow>) c z; fuse z d\<rbrakk> \<Longrightarrow> p \<Rightarrow> d\<close>
+      by (rule basic.composed_transition, auto simp add: basic_absorb_from_fuse)}
+
+  As indicated above, the behavior of \<^term>\<open>silent\<close> and \<^term>\<open>fuse\<close> should generally be such that
+  \<^term>\<open>silent\<close> adds a silent label to a process and \<^term>\<open>fuse\<close> removes a silent label from a nested
+  residual. The following axioms are in line with this behavior and are at the same time specific
+  enough to allow us to develop the theory of weak bisimilarity solely based on the \<^term>\<open>silent\<close>
+  and \<^term>\<open>fuse\<close> parameters:
+
+    \<^item> Silent naturality:@{lemma [display]
+      \<open>\<X> OO silent = silent OO lift \<X>\<close>
+      by (blast
+        elim: basic_silent.cases basic_lift_cases
+        intro: basic_internal_is_silent basic_lift_intros)}
+
+    \<^item> Fuse naturality:@{lemma [display]
+      \<open>lift (lift \<X>) OO fuse = fuse OO lift \<X>\<close>
+      by (simp add:
+        basic_fuse_def
+        basic_residual.rel_compp [symmetric]
+        basic_silent_converse_naturality)}
+
+    \<^item> Left-neutrality:@{lemma [display]
+      \<open>silent OO fuse = (=)\<close>
+      by (
+        unfold basic_fuse_def,
+        blast elim: basic_silent.cases basic_lift_cases intro: basic_internal_is_silent
+      )}
+
+    \<^item> Right-neutrality:@{lemma [display]
+      \<open>lift silent OO fuse = (=)\<close>
+      by (fold basic_absorb_from_fuse, fact basic.right_neutrality)}
+
+    \<^item> Associativity:@{lemma [display]
+      \<open>fuse OO fuse = lift fuse OO fuse\<close>
+      by (
+        unfold basic_fuse_def,
+        simp add:
+          basic_residual.rel_compp [symmetric]
+          basic_silent_converse_naturality [symmetric]
+          sup_assoc
+          sup_commute
+          sup_left_commute
+      )}
+
+  The above axioms are precisely the axioms for monads.\<^footnote>\<open>The analogy to monads in the Haskell sense
+  can be seen from the fact that replacing \<^term>\<open>lift\<close>,\<^term>\<open>silent\<close>, \<^term>\<open>fuse\<close>, \<^term>\<open>(=)\<close>, and
+  \<^term>\<open>(OO)\<close> in these axioms by Haskell's \<^verbatim>\<open>fmap\<close>, \<^verbatim>\<open>return\<close>, \<^verbatim>\<open>join\<close>, \<^verbatim>\<open>id\<close>, and \<^verbatim>\<open>(.)\<close> yields the
+  naturality properties of \<^verbatim>\<open>return\<close> and \<^verbatim>\<open>join\<close>, which hold automatically because of
+  parametricity~@{cite "wadler:fpca-1989"}, as well as Haskell's \<^verbatim>\<open>join\<close>-based monad axioms.\<close>
+  Therefore, we can say that a weak residual structure is just a monad in the category of types and
+  relations -- a completely unproblematic specification.
+
+  The monadic approach to weak residuals is actually very general. It does not only allow for a
+  common treatment of residuals with different scope opening patters but also makes non-standard
+  notions of silence possible, for example, by allowing multiple silent labels. Despite this
+  generality, typical properties of weak bisimilarity can be proved generically. Concretely, we have
+  developed formal proofs of the following statements:
+
+    \<^item> Weak bisimilarity is the same as ``mixed'' bisimilarity, a notion of bisimilarity where
+      ordinary transitions are simulated by weak transitions.
+
+    \<^item> Strong bisimilarity is a subrelation of weak bisimilarity.
+
+  Furthermore, the generic definition of the weak transition relation~\<^term>\<open>(\<Rightarrow>)\<close> is simpler than
+  the traditional definition shown at the beginning of \hyperref[weak-residuals]{this subsection} in
+  that it does not distinguish between silent and observable transitions; this distinction is pushed
+  into the definitions of the \<^term>\<open>silent\<close> and \<^term>\<open>fuse\<close> relations of the individual notions of
+  weak residual. The simple structure of the definition of~\<^term>\<open>(\<Rightarrow>)\<close> encourages a simple structure
+  of generic proofs about weak transitions.
+\<close>
+
 subsection \<open>Normal Weak Residuals\<close>
+
+text \<open>
+  The monadic approach to weak residuals forces us to implement the two relations \<^term>\<open>silent\<close> and
+  \<^term>\<open>fuse\<close> and prove their properties for every notion of residual. This usually takes quite some
+  effort, in particular because the definition of the \<^term>\<open>fuse\<close> relation is typically non-trivial,
+  which also affects the proofs of its properties. The reward is that we can use non-standard
+  notions of silence. However, we rarely need this additional power, because we are usually fine
+  with having \<^emph>\<open>normal weak residuals\<close>, weak residuals that use a dedicated label to indicate
+  silence. We introduce a more specific algebraic structure for normal weak residuals, which is much
+  easier to instantiate than the monad structure of arbitrary weak residuals.
+
+  We identify silence using just a \<^term>\<open>silent\<close> relation that has the following properties:
+
+    \<^item> Naturality:@{lemma [display]
+      \<open>\<X> OO silent = silent OO lift \<X>\<close>
+      by (blast
+        elim: basic_silent.cases basic_lift_cases
+        intro: basic_internal_is_silent basic_lift_intros)}
+
+    \<^item> Left-uniqueness and left-totality:@{lemma [display]
+      \<open>silent OO silent\<inverse>\<inverse> = (=)\<close>
+      by (fact basic.silent_left_uniqueness_and_left_totality)}
+
+    \<^item> Right-uniqueness:@{lemma [display, source]
+      "silent\<inverse>\<inverse> OO silent \<le> (=)"
+      by (fact basic.silent_right_uniqueness)}
+
+  Note that in fact these axioms ensure that \<^term>\<open>silent\<close> identifies a single label, our silent
+  label. This shows that, although we do not have first-class labels explicitly, we can nevertheless
+  have first-class representations of those labels that do not involve scope opening.
+
+  From a \<^term>\<open>silent\<close> relation we can derive a relation \<^term>\<open>fuse\<close> as follows:@{lemma [display]
+  \<open>fuse = silent\<inverse>\<inverse> \<squnion> lift silent\<inverse>\<inverse>\<close>
+  by (simp add: basic_fuse_def)}
+  This derivation captures exactly the idea that \<^term>\<open>fuse\<close> removes a silent label from a nested
+  residual: since \<^term>\<open>silent\<close> adds a silent label, \<^term>\<open>silent\<inverse>\<inverse>\<close> removes a silent label, and
+  consequently \<^term>\<open>lift silent\<inverse>\<inverse>\<close> removes a silent label under another label.
+
+  A \<^term>\<open>silent\<close> relation with the above properties and the \<^term>\<open>fuse\<close> relation derived from it
+  together fulfill the monad axioms, which shows that normal weak residuals are in fact weak
+  residuals.
+\<close>
 
 section \<open>Related Work\<close>
 
