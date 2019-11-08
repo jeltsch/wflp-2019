@@ -667,6 +667,19 @@ text \<open>
   enough to allow us to develop the theory of weak bisimilarity solely based on the \<^term>\<open>silent\<close>
   and \<^term>\<open>fuse\<close> parameters:
 
+    \<^item> Silent naturality:@{lemma [display]
+      \<open>\<X> OO silent = silent OO lift \<X>\<close>
+      by (blast
+        elim: basic_silent.cases basic_lift_cases
+        intro: basic_internal_is_silent basic_lift_intros)}
+
+    \<^item> Fuse naturality:@{lemma [display]
+      \<open>lift (lift \<X>) OO fuse = fuse OO lift \<X>\<close>
+      by (simp add:
+        basic_fuse_def
+        basic_residual.rel_compp [symmetric]
+        basic_silent_converse_naturality)}
+
     \<^item> Left-neutrality:@{lemma [display]
       \<open>silent OO fuse = (=)\<close>
       by (
@@ -692,9 +705,11 @@ text \<open>
 
   The above axioms are precisely the axioms for monads.\<^footnote>\<open>The analogy to monads in the Haskell sense
   can be seen from the fact that replacing \<^term>\<open>lift\<close>,\<^term>\<open>silent\<close>, \<^term>\<open>fuse\<close>, \<^term>\<open>(=)\<close>, and
-  \<^term>\<open>(OO)\<close> in these axioms by Haskell's \<^verbatim>\<open>fmap\<close>, \<^verbatim>\<open>return\<close>, \<^verbatim>\<open>join\<close>, \<^verbatim>\<open>id\<close>, and \<^verbatim>\<open>(.)\<close> yields
-  Haskell's \<^verbatim>\<open>join\<close>-based monad axioms.\<close> Therefore, we can say that a weak residual structure is
-  just a monad in the category of types and relations -- a completely unproblematic specification.
+  \<^term>\<open>(OO)\<close> in these axioms by Haskell's \<^verbatim>\<open>fmap\<close>, \<^verbatim>\<open>return\<close>, \<^verbatim>\<open>join\<close>, \<^verbatim>\<open>id\<close>, and \<^verbatim>\<open>(.)\<close> yields the
+  naturality properties of \<^verbatim>\<open>return\<close> and \<^verbatim>\<open>join\<close>, which hold automatically because of
+  parametricity~@{cite "wadler:fpca-1989"}, as well as Haskell's \<^verbatim>\<open>join\<close>-based monad axioms.\<close>
+  Therefore, we can say that a weak residual structure is just a monad in the category of types and
+  relations -- a completely unproblematic specification.
 
   The monadic approach to weak residuals is actually very general. It does not only allow for a
   common treatment of residuals with different scope opening patters but also makes non-standard
@@ -729,6 +744,12 @@ text \<open>
 
   We identify silence using just a \<^term>\<open>silent\<close> relation that has the following properties:
 
+    \<^item> Naturality:@{lemma [display]
+      \<open>\<X> OO silent = silent OO lift \<X>\<close>
+      by (blast
+        elim: basic_silent.cases basic_lift_cases
+        intro: basic_internal_is_silent basic_lift_intros)}
+
     \<^item> Left-uniqueness and left-totality:@{lemma [display]
       \<open>silent OO silent\<inverse>\<inverse> = (=)\<close>
       by (fact basic.silent_left_uniqueness_and_left_totality)}
@@ -736,12 +757,6 @@ text \<open>
     \<^item> Right-uniqueness:@{lemma [display, source]
       "silent\<inverse>\<inverse> OO silent \<le> (=)"
       by (fact basic.silent_right_uniqueness)}
-
-    \<^item> Naturality:\<^footnote>\<open>This is a theorem in the general case.\<close>@{lemma [display]
-      \<open>\<X> OO silent = silent OO lift \<X>\<close>
-      by (blast
-        elim: basic_silent.cases basic_lift_cases
-        intro: basic_internal_is_silent basic_lift_intros)}
 
   Note that in fact these axioms ensure that \<^term>\<open>silent\<close> identifies a single label, our silent
   label. This shows that, although we do not have first-class labels explicitly, we can nevertheless
