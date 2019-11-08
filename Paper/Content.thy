@@ -717,6 +717,48 @@ text \<open>
 
 subsection \<open>Normal Weak Residuals\<close>
 
+text \<open>
+  The monadic approach to weak residuals forces us to implement the two relations \<^term>\<open>silent\<close> and
+  \<^term>\<open>fuse\<close> and prove their properties for every notion of residual. This usually takes quite some
+  effort, in particular because the definition of the \<^term>\<open>fuse\<close> relation is typically non-trivial,
+  which also affects the proofs of its properties. The reward is that we can use non-standard
+  notions of silence. However, we rarely need this additional power, because we are usually fine
+  with having \<^emph>\<open>normal weak residuals\<close>, weak residuals that use a dedicated label to indicate
+  silence. We introduce a more specific algebraic structure for normal weak residuals, which is much
+  easier to instantiate than the monad structure of arbitrary weak residuals.
+
+  We identify silence using just a \<^term>\<open>silent\<close> relation that has the following properties:
+
+    \<^item> Left-uniqueness and left-totality:@{lemma [display]
+      \<open>silent OO silent\<inverse>\<inverse> = (=)\<close>
+      by (fact basic.silent_left_uniqueness_and_left_totality)}
+
+    \<^item> Right-uniqueness:@{lemma [display, source]
+      "silent\<inverse>\<inverse> OO silent \<le> (=)"
+      by (fact basic.silent_right_uniqueness)}
+
+    \<^item> Naturality:\<^footnote>\<open>This is a theorem in the general case.\<close>@{lemma [display]
+      \<open>\<X> OO silent = silent OO lift \<X>\<close>
+      by (blast
+        elim: basic_silent.cases basic_lift_cases
+        intro: basic_internal_is_silent basic_lift_intros)}
+
+  Note that in fact these axioms ensure that \<^term>\<open>silent\<close> identifies a single label, our silent
+  label. This shows that, although we do not have first-class labels explicitly, we can nevertheless
+  have first-class representations of those labels that do not involve scope opening.
+
+  From a \<^term>\<open>silent\<close> relation we can derive a relation \<^term>\<open>fuse\<close> as follows:@{lemma [display]
+  \<open>fuse = silent\<inverse>\<inverse> \<squnion> lift silent\<inverse>\<inverse>\<close>
+  by (simp add: basic_fuse_def)}
+  This derivation captures exactly the idea that \<^term>\<open>fuse\<close> removes a silent label from a nested
+  residual: since \<^term>\<open>silent\<close> adds a silent label, \<^term>\<open>silent\<inverse>\<inverse>\<close> removes a silent label, and
+  consequently \<^term>\<open>lift silent\<inverse>\<inverse>\<close> removes a silent label under another label.
+
+  A \<^term>\<open>silent\<close> relation with the above properties and the \<^term>\<open>fuse\<close> relation derived from it
+  together fulfill the monad axioms, which shows that normal weak residuals are in fact weak
+  residuals.
+\<close>
+
 section \<open>Related Work\<close>
 
 section \<open>Summary and Outlook\<close>
