@@ -5,11 +5,62 @@ begin
 section \<open>Introduction\<close>
 
 text \<open>
-  This paper has been produced from documented Isabelle source
-  code~@{cite "jeltsch:wflp-2019-source"}, which has been checked with Isabelle2018.
+  A blockchain is an open, distributed database that stores a growing list, the \<^emph>\<open>ledger\<close>, and
+  achieves security by employing advanced cryptographic methods. Blockchains are used in finance for
+  implementing cryptocurrencies and smart contracts and have applications in other fields too.
+
+  A blockchain system establishes data consistency using a \<^emph>\<open>consensus protocol\<close>. There are two
+  kinds of consensus protocols:
+
+    \<^item> \<^emph>\<open>Proof of work\<close> protocols require participants to solve computational puzzles in order to
+      contribute data to the blockchain.
+
+    \<^item> \<^emph>\<open>Proof of stake\<close> protocols make the opportunity to contribute data dependent on the stake
+      participants possess, such as money in a cryptocurrency.
+
+  Since the correctness of a blockchain system rests on the correctness of its consensus protocol,
+  several projects are underway that apply formal methods to these protocols. One such project is
+  carried out by a team of the Formal Methods Group at IOHK. This project, in which the author is
+  involved, aims at a formally verified implementation of the Ouroboros family of consensus
+  protocols~@{cite "kiayias:crypto-2017" and "david:eurocrypt-2018" and "badertscher:ccs-2018"},
+  which form the backbone of the Cardano blockchain.
+
+  All protocols in the Ouroboros family use the proof of stake mechanism and come with rigorous
+  security guarantees. In fact, the original Ouroboros protocol, dubbed Ouroboros Classic, was the
+  first proof-of-stake protocol to have such guarantees. The Cardano blockchain is the basis of the
+  cryptocurrency Ada and the smart contract languages Plutus~@{cite "chakravarty:plutus"} and
+  Marlowe~@{cite "lamela:isola-2018"}. Both Plutus and Marlowe are functional languages, but while
+  Plutus is Turing-complete, Marlowe is deliberately restricted in its expressivity to make
+  implementing common contracts easy.
+
+  In this paper, we report on the first outcome of our formalization effort: the \<^emph>\<open>\<open>\<natural>\<close>-calculus\<close>
+  (pronounced ``natural calculus''). The \<open>\<natural>\<close>-calculus is a process calculus that serves as our
+  specification and implementation language. We make the following contributions:
+
+    \<^item> In Sect.~\ref{the-natural-calculus}, we present the language and the operational semantics of
+      the \<open>\<natural>\<close>-calculus. The latter is unique in that it uses a stack of two labeled transition
+      systems to treat phenomena like data transfer and the opening and closing of channel scope in
+      a modular fashion
+
+    \<^item> The presence of multiple transition systems calls for a generic treatment of derived
+      concurrency concepts such as strong and weak bisimilarity. In
+      Sect.~\ref{residuals-axiomatically}, we develop an abstract theory of transition systems to
+      achieve such a generic treatment. Our theory captures notions like scope opening and silent
+      transitions using axiomatically defined algebraic structures. For these structures, functors
+      and monads play a crucial role.
+
+  \<^noindent> We conclude with Sects. \ref{related-work} and~\ref{summary-and-outlook}, where we discuss
+  related work and give a summary and an outlook.
+
+  To this end, we have formalized large parts of the \<open>\<natural>\<close>-calculus and our complete theory of
+  transition systems in Isabelle/HOL~@{cite "jeltsch:ouroboros-formalization"}. Furthermore, we have
+  produced this paper from documented Isabelle source code~@{cite "jeltsch:wflp-2019-source"}, which
+  we have checked with Isabelle2018.
 \<close>
 
 section \<open>The \<open>\<natural>\<close>-Calculus\<close>
+
+text_raw \<open>\label{the-natural-calculus}\<close>
 
 text \<open>
   The \<open>\<natural>\<close>-calculus is a process calculus in the tradition of the
@@ -395,6 +446,8 @@ text \<open>
 
 section \<open>Residuals Axiomatically\<close>
 
+text_raw \<open>\label{residuals-axiomatically}\<close>
+
 text \<open>
   As it stands, we have to develop the theory of bisimilarity separately for the basic and the
   proper transition system. This means, we have to essentially duplicate definitions of concepts
@@ -776,6 +829,10 @@ text \<open>
 
 section \<open>Related Work\<close>
 
+text_raw \<open>\label{related-work}\<close>
+
 section \<open>Summary and Outlook\<close>
+
+text_raw \<open>\label{summary-and-outlook}\<close>
 
 end %invisible
