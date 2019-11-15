@@ -831,6 +831,35 @@ section \<open>Related Work\<close>
 
 text_raw \<open>\label{related-work}\<close>
 
+text \<open>
+  We are not the first ones to formalize a process calculus using HOAS.
+  Honsell~et~al.~@{cite "honsell:tcs-253-2"}, for example, define a HOAS-version of the
+  $\pi$-calculus in Coq and prove considerable parts of its metatheory. Their formalization does not
+  allow the construction of \<^emph>\<open>exotic terms\<close>, that is, processes whose structure depends on data. In
+  our formalization, we use exotic terms deliberately for branching. However, we actually want
+  process structure to depend on ordinary data only; dependence on channels, especially local
+  channels, is something we would like to prevent. The approach of Honsell~et~al. for ruling out
+  exotic terms is to declare the type of channels as a parameter. Unfortunately, we cannot adopt
+  this approach for our formalization, since the classical nature of Isabelle/HOL makes exotic terms
+  possible even if the channel type is abstract.
+
+  Röckl and Hirschkoff~@{cite "roeckel:jfp-13-2"} develop a HOAS-based implementation of the
+  language of the $\pi$-calculus in Isabelle/HOL and show that it is adequate with respect to an
+  ordinary, first-order implementation. They prove several syntactic properties but do not deal with
+  transitions and bisimilarity at all. Their definition of processes includes exotic terms, but they
+  define a separate wellformedness predicate that identifies those processes that are not exotic.
+
+  Neither of the two works described uses an abstract theory of transition systems like we do.
+  However, there is also no real demand for that, as these developments only deal with one or even
+  no transition system.
+
+  We use HOAS, because we can avoid the difficulties of name handling this way. Another approach is
+  to keep names explicit but use nominal logic~@{cite "pitts:ic-186-2"} to make name handling
+  easier. Bengtson follows this approach in his dissertation~@{cite "bengtson:phd-thesis"}. He
+  formalizes several process calculi, namely CCS, the $\pi$-calculus, and $\psi$-calculi, in
+  Isabelle/HOL, making use of its support for nominal logic.
+\<close>
+
 section \<open>Summary and Outlook\<close>
 
 text_raw \<open>\label{summary-and-outlook}\<close>
