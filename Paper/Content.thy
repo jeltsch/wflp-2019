@@ -883,4 +883,16 @@ text \<open>
   the calculus and its implementation.
 \<close>
 
+text_raw \<open>\subsection*{Acknowledgements}\<close>
+
+text \<open>
+  I want to thank my colleagues at Well-Typed and IOHK for their encouraging and helpful feedback on
+  this work. Special thanks go to Javier D\'iaz for stress-testing the \<open>\<natural>\<close>-calculus in his proofs
+  of network equivalences, pointing me to some important related work, and proofreading this paper.
+  Furthermore, I want to particularly thank Duncan Coutts and Philipp Kant for providing guidance
+  and feedback concerning our efforts towards a verified implementation of the Ouroboros consensus
+  protocols as well as Edsko de Vries for his help with process calculi and in particular for
+  putting us on the HOAS path.
+\<close>
+
 end %invisible
