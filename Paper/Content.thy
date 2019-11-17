@@ -864,4 +864,23 @@ section \<open>Summary and Outlook\<close>
 
 text_raw \<open>\label{summary-and-outlook}\<close>
 
+text \<open>
+  We have presented the language and the operational semantics of the \<open>\<natural>\<close>-calculus, a
+  general-purpose process calculus embedded into functional host languages using HOAS. Since the
+  operational semantics of the \<open>\<natural>\<close>-calculus is defined using two transition systems, we have
+  developed an abstract theory of transition systems to treat concepts like bisimilarity
+  generically. We have formalized large parts of the \<open>\<natural>\<close>-calculus and our complete theory of
+  transition systems in Isabelle/HOL~@{cite "jeltsch:ouroboros-formalization"}.
+
+  As it stands, the \<open>\<natural>\<close>-calculus allows process structure to depend on channels, which is something
+  we would like to avoid. Thus an important task for the future is the development of techniques
+  that allows us to prevent channel-dependent behavior while continuing to use HOAS for expressing
+  binding of names.
+
+  We plan to very soon start using our process calculus for developing a formally verified
+  implementation of the Ouroboros family of consensus protocols. Our hope is to gain valuable
+  feedback about our process calculus work this way, which can potentially lead to improvements of
+  the calculus and its implementation.
+\<close>
+
 end %invisible
