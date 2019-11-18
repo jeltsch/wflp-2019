@@ -1,8 +1,10 @@
 chapter WFLP_2019
 
 session Slides = Chi_Calculus +
-  description
-    \<open>A Process Calculus for Formally Verifying Blockchain Consensus Protocols (slides)\<close>
+  description \<open>
+    This is the source code of the slides of the talk "A Process Calculus for Formally Verifying
+    Blockchain Consensus Protocols", which was presented at WFLP '19.
+  \<close>
   theories
     Content
   document_files
