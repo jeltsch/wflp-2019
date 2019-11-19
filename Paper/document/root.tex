@@ -63,8 +63,8 @@ this task.
 
 Since consensus protocols play such a crucial role in blockchain technology, several projects are
 underway that apply formal methods to these protocols. One such project is carried out by a team of
-the Formal Methods Group at IOHK. This project, in which I am involved, aims at a formally verified
-implementation of the Ouroboros family of consensus protocols, the backbone of the Cardano
+the Formal Methods Group at IOHK. This project, in which the author is involved, aims at a formally
+verified implementation of the Ouroboros family of consensus protocols, the backbone of the Cardano
 blockchain. The first outcome of our project is the $\natural$-calculus (pronounced ``natural
 calculus''), a general-purpose process calculus that serves as our implementation language. The
 $\natural$-calculus is a domain-specific language embedded in a functional host language using
@@ -74,10 +74,9 @@ This paper will be a ramble through the $\natural$-calculus. First we will look 
 its operational semantics. The latter is unique in that it uses a stack of two labeled transition
 systems to treat phenomena like data transfer and the opening and closing of channel scope in a
 modular fashion. The presence of multiple transition systems calls for a generic treatment of
-derived concurrency concepts such as strong and weak bisimilarity. I will show you how such a
-treatment can be achieved by capturing notions like scope opening and silent transitions abstractly
-using axiomatically defined algebraic structures. You will, perhaps surprisingly, encounter some old
-friends of the functional programmer, namely functors and monads, albeit in a different guise.
+derived concurrency concepts. We will see how such a treatment can be achieved by capturing notions
+like scope opening and silent transitions abstractly using axiomatically defined algebraic
+structures based on functors and monads.
 
 \keywords{%
     Blockchain                    \and

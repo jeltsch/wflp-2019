@@ -9,23 +9,23 @@ text \<open>
   achieves security by employing advanced cryptographic methods. Blockchains are used in finance for
   implementing cryptocurrencies and smart contracts and have applications in other fields too.
 
-  A blockchain system establishes data consistency using a \<^emph>\<open>consensus protocol\<close>. There are two
-  kinds of consensus protocols:
+  A blockchain system establishes data consistency using a \<^emph>\<open>consensus protocol\<close>. There are two main
+  kinds of such protocols:
 
-    \<^item> \<^emph>\<open>Proof of work\<close> protocols require participants to solve computational puzzles in order to
+    \<^item> \<^emph>\<open>Proof-of-work\<close> protocols require participants to solve computational puzzles in order to
       contribute data to the blockchain.
 
-    \<^item> \<^emph>\<open>Proof of stake\<close> protocols make the opportunity to contribute data dependent on the stake
+    \<^item> \<^emph>\<open>Proof-of-stake\<close> protocols make the opportunity to contribute data dependent on the stake
       participants possess, such as money in a cryptocurrency.
 
   Since the correctness of a blockchain system rests on the correctness of its consensus protocol,
-  several projects are underway that apply formal methods to these protocols. One such project is
-  carried out by a team of the Formal Methods Group at IOHK. This project, in which the author is
+  several projects are underway that apply formal methods to consensus protocols. One such project
+  is carried out by a team of the Formal Methods Group at IOHK. This project, in which the author is
   involved, aims at a formally verified implementation of the Ouroboros family of consensus
   protocols~@{cite "kiayias:crypto-2017" and "david:eurocrypt-2018" and "badertscher:ccs-2018"},
   which form the backbone of the Cardano blockchain.
 
-  All protocols in the Ouroboros family use the proof of stake mechanism and come with rigorous
+  All protocols in the Ouroboros family use the proof-of-stake mechanism and come with rigorous
   security guarantees. In fact, the original Ouroboros protocol, dubbed Ouroboros Classic, was the
   first proof-of-stake protocol to have such guarantees. The Cardano blockchain is the basis of the
   cryptocurrency Ada and the smart contract languages Plutus~@{cite "chakravarty:plutus"} and
@@ -33,9 +33,9 @@ text \<open>
   Plutus is Turing-complete, Marlowe is deliberately restricted in its expressivity to make
   implementing common contracts easy.
 
-  In this paper, we report on the first outcome of our formalization effort: the \<^emph>\<open>\<open>\<natural>\<close>-calculus\<close>
-  (pronounced ``natural calculus''). The \<open>\<natural>\<close>-calculus is a process calculus that serves as our
-  specification and implementation language. We make the following contributions:
+  In this paper, we report on the first outcome of our Ouroboros formalization effort: the
+  \<^emph>\<open>\<open>\<natural>\<close>-calculus\<close> (pronounced ``natural calculus''). The \<open>\<natural>\<close>-calculus is a process calculus that
+  serves as our specification and implementation language. We make the following contributions:
 
     \<^item> In Sect.~\ref{the-natural-calculus}, we present the language and the operational semantics of
       the \<open>\<natural>\<close>-calculus. The latter is unique in that it uses a stack of two labeled transition
@@ -43,19 +43,19 @@ text \<open>
       a modular fashion
 
     \<^item> The presence of multiple transition systems calls for a generic treatment of derived
-      concurrency concepts such as strong and weak bisimilarity. In
+      concurrency concepts, such as strong and weak bisimilarity. In
       Sect.~\ref{residuals-axiomatically}, we develop an abstract theory of transition systems to
       achieve such a generic treatment. Our theory captures notions like scope opening and silent
-      transitions using axiomatically defined algebraic structures. For these structures, functors
+      transitions using axiomatically defined algebraic structures. In these structures, functors
       and monads play a crucial role.
 
-  \<^noindent> We conclude with Sects. \ref{related-work} and~\ref{summary-and-outlook}, where we discuss
-  related work and give a summary and an outlook.
+  \<^noindent> We conclude this paper with Sects. \ref{related-work} and~\ref{summary-and-outlook}, where we
+  discuss related work and give a summary and an outlook.
 
-  To this end, we have formalized large parts of the \<open>\<natural>\<close>-calculus and our complete theory of
-  transition systems in Isabelle/HOL~@{cite "jeltsch:ouroboros-formalization"}. Furthermore, we have
+  To this end, we have formalized~@{cite "jeltsch:ouroboros-formalization"} large parts of the
+  \<open>\<natural>\<close>-calculus and our complete theory of transition systems in Isabelle/HOL. Furthermore, we have
   produced this paper from documented Isabelle source code~@{cite "jeltsch:wflp-2019-source"}, which
-  we have checked with Isabelle2018.
+  we have checked against our formalization.
 \<close>
 
 section \<open>The \<open>\<natural>\<close>-Calculus\<close>
@@ -78,7 +78,7 @@ text \<open>
 
   Our embedding technique uses higher-order abstract syntax (HOAS)~@{cite "pfenning:pldi-1988"},
   which means we represent binding of names using functions of the host language. An immediate
-  consequence of this is that the host language is dealing with all the issues regarding names, like
+  consequence of this is that the host language deals with all the issues regarding names, like
   shadowing and \<open>\<alpha>\<close>-equivalence, which simplifies the implementation of the calculus. Furthermore,
   HOAS gives us support for arbitrary data for free, since we can easily represent data by values of
   the host language. This lifts the restriction of the \<open>\<pi>\<close>-calculus that channels are the only kind
@@ -100,7 +100,7 @@ text \<open>
   In the following, we list the different kinds of processes. For describing their syntax, we use
   statements of the form \<open>C x\<^sub>1 \<dots> x\<^sub>n \<equiv> e\<close>. The left-hand side of such a statement is an application
   of a data constructor of the \<^type>\<open>process\<close> type to argument variables; it showcases the ordinary
-  notation for the respective kind of process. The right-hand side is a term that is equal to the
+  notation for the respective kind of processes. The right-hand side is a term that is equal to the
   left-hand side but uses convenient notation introduced by us using Isabelle's means for defining
   custom syntax. The kinds of processes are as follows:
 
@@ -124,7 +124,7 @@ text \<open>
       "NewChannel P \<equiv> \<nu> a. P a"
       by (fact reflexive)}
 
-  \<^noindent> The binders (\<open>\<triangleleft>\<close>~and~\<open>\<nu>\<close>) bind stronger than the infix operator~(\<open>\<parallel>\<close>), which is not what the
+  \<^noindent> The binders (\<open>\<triangleright>\<close>~and~\<open>\<nu>\<close>) bind stronger than the infix operator~(\<open>\<parallel>\<close>), which is not what the
   reader might have expected but is typical for process calculi.
 
   There are a few interesting points to note regarding processes and their notation:
@@ -137,12 +137,12 @@ text \<open>
       functions, we can still use convenient binder notation for \<^const>\<open>Receive\<close> and
       \<^const>\<open>NewChannel\<close> processes. A term~\<^term>\<open>e\<close> in \<^term>\<open>a \<triangleright> x. e\<close> or \<^term>\<open>\<nu> a. e :: process\<close>
       does not have to be an application of a function~\<^term>\<open>P\<close> to the bound variable. Every term
-      that possibly mentions the bound variable is fine. For example, \<^term>\<open>a \<triangleright> x. b \<triangleleft> x\<close> is a valid
-      term, which is equal to @{term [source] "Receive a (\<lambda>x. b \<triangleleft> x)"}.
+      that possibly mentions the bound variable is fine. For example, \<^term>\<open>a \<triangleright> x. b \<triangleleft> x \<parallel> c \<triangleleft> x\<close> is
+      a valid term, which is equal to @{term [source] "Receive a (\<lambda>x. b \<triangleleft> x \<parallel> c \<triangleleft> x)"}.
 
     \<^item> HOAS gives us the opportunity to construct processes that include computation and branching,
-      although we do not have special process calculus constructs for these things. For example, the
-      process @{term [source] "a \<triangleright> y. (if y \<noteq> x then b \<triangleleft> y else \<zero>)"}, which performs a kind of
+      despite the process calculus not having dedicated constructs for these things. For example,
+      the process @{term [source] "a \<triangleright> y. (if y \<noteq> x then b \<triangleleft> y else \<zero>)"}, which performs a kind of
       conditional forwarding, carries the inequality test and the branching inside the continuation
       argument of \<^const>\<open>Receive\<close>.
 
@@ -247,9 +247,9 @@ text \<open>
   hard to get right. The complexity has two reasons:
 
     \<^item> Some labels deal with multiple concepts, namely scope opening and sending. In the
-      \<open>\<natural>\<close>-calculus, these labels are not always of the relatively simple form \<open>a \<triangleleft> \<nu> b. b\<close> discussed
-      above, but generally of the more complex form \<open>\<nu> b\<^sub>1 \<dots> b\<^sub>n. a \<triangleleft> f b\<^sub>1 \<dots> b\<^sub>n\<close>, because arbitrary
-      values depending on multiple local channels can be sent.
+      \<open>\<natural>\<close>-calculus, these labels are not necessarily of the relatively simple form \<open>a \<triangleleft> \<nu> b. b\<close>
+      discussed above, but generally of the more complex form \<open>\<nu> b\<^sub>1 \<dots> b\<^sub>n. a \<triangleleft> f b\<^sub>1 \<dots> b\<^sub>n\<close>, because
+      arbitrary values depending on multiple local channels can be sent.
 
     \<^item> Some rules deal with multiple concepts, namely the rule about communication with scope
       closing, which deals with precisely these two things, and the rule about acting inside scope,
@@ -320,31 +320,30 @@ text \<open>
   facts for one and two published channels are as follows:
 
     \<^item> One channel:@{lemma [display]
-      \<open>\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> P b; \<And>b. P b \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> f b\<rparr> Q b\<rbrakk> \<Longrightarrow> p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b. f b\<rparr> Q b\<close>
+      \<open>\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> Q b; \<And>b. Q b \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> f b\<rparr> R b\<rbrakk> \<Longrightarrow> p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b. f b\<rparr> R b\<close>
       by (fact output_with_opening)}
 
     \<^item> Two channels:@{lemma [display, source]
-      "\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> P b; \<And>b. P b \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> c. f b c\<rparr> Q b c\<rbrakk> \<Longrightarrow>\<^latex>\<open>\\\<close>p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b c. f b c\<rparr> Q b c"
+      "\<lbrakk>p \<rightarrow>\<^sub>\<flat>\<lbrace>\<nu> b\<rbrace> Q b; \<And>b. Q b \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> c. f b c\<rparr> R b c\<rbrakk> \<Longrightarrow>\<^latex>\<open>\\\<close>p \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b c. f b c\<rparr> R b c"
       by (fact output_with_opening)}
 
   \<^noindent> The facts for more published channels are analogous. All of these facts can be captured by a
   single rule, which we do not show here for the sake of simplicity.
 
   As it stands, the proper transition system has the issue that a scope can also be opened when the
-  respective channel is actually not published. For example, @{lemma\<open>\<nu> b. a \<triangleleft> x \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b. x\<rparr> \<zero>\<close> by
-  (blast intro: opening sending output_without_opening output_with_opening)} is a possible
-  transition. We are currently investigating ways to fix this issue. That said, this issue is of
-  little relevance for the rest of this paper, where we discuss the effects of transitions involving
-  scope opening in a way that is largely independent of the particularities of a concrete transition
-  system.
+  respective channel is not published. For example, @{lemma\<open>\<nu> b. a \<triangleleft> x \<rightarrow>\<^sub>\<sharp>\<lparr>a \<triangleleft> \<nu> b. x\<rparr> \<zero>\<close> by (blast
+  intro: opening sending output_without_opening output_with_opening)} is a possible transition. We
+  are currently investigating ways to fix this issue. That said, this issue is of little relevance
+  for the rest of this paper, where we discuss the effects of transitions involving scope opening in
+  a way that is largely independent of the particularities of concrete transition systems.
 
   A key issue with both the basic and the proper transition system is that, whenever a label
   contains a binder, the scope of this binder includes any following target process. As a result, we
   can treat neither of the two transition relations as a ternary relation, where source processes,
-  labels, and target processes are separate entities. As a solution, we treat the combination of a
-  label and an associated target process as a single entity, which we call a \<^emph>\<open>residual\<close>. Our
+  labels, and target processes are separate entities. As a solution, we consider the combination of
+  a label and an associated target process a single entity, which we call a \<^emph>\<open>residual\<close>. Our
   transition relations then become binary, relating source processes and residuals. This approach
-  has been taken in \<open>\<psi>\<close>-calculi, for example.
+  has been taken in the formalization of \<open>\<psi>\<close>-calculi~@{cite "bengtson:lmcs-7-1"}, for example.
 
   We define an inductive data type whose values are the residuals of the basic transition system.
   There are two kinds of such residuals:
@@ -364,7 +363,7 @@ text \<open>
   \<^term>\<open>\<lbrace>\<xi>\<rbrace> e\<close> can be formed from terms \<^term>\<open>e\<close> of any type~\<^term>\<open>\<alpha>\<close>, with the resulting type being
   \<open>\<alpha> basic_residual\<close>. This permits us to construct \<^emph>\<open>nested residuals\<close>, residuals with two labels,
   which have type \<^typ>\<open>process basic_residual basic_residual\<close>. Nested residuals will play a role in
-  Subsection~\ref{weak-residuals}.
+  Subsect.~\ref{weak-residuals}.
 
   We also introduce an analogous type constructor \<^type>\<open>proper_residual\<close> for the proper transition
   system. The definition of \<^type>\<open>proper_residual\<close> is considerably more complex than the definition
@@ -387,16 +386,16 @@ lemma %invisible
   by (blast elim: proper_lift_cases intro: simple_lift)
 
 text \<open>
-  Ultimately, we are interested in proving that different processes behave in the same or at least a
-  similar way. The standard notion of behavioral equivalence is \<^emph>\<open>bisimilarity\<close>. A typical approach
-  to define bisimilarity is the following one:
+  Ultimately, we are interested in proving that different processes behave in the same way or at
+  least in similar ways. The standard notion of behavioral equivalence is \<^emph>\<open>bisimilarity\<close>. A typical
+  approach to define bisimilarity is the following one:
 
-    \<^enum> We define the predicate \<^const>\<open>sim\<close> on binary relations between process as
+    \<^enum> We define the predicate \<^const>\<open>sim\<close> on binary relations between processes as
       follows:@{text [display]
-      \<open>sim \<X> \<longleftrightarrow>(\<forall>p q \<xi> p'. \<X> p q \<and> p \<rightarrow>\<lparr>\<xi>\<rparr> p' \<longrightarrow> (\<exists>q'. q \<rightarrow>\<lparr>\<xi>\<rparr> q' \<and> \<X> p' q'))\<close>}
+      \<open>sim \<X> \<longleftrightarrow> (\<forall>p q \<xi> p'. \<X> p q \<and> p \<rightarrow>\<lparr>\<xi>\<rparr> p' \<longrightarrow> (\<exists>q'. q \<rightarrow>\<lparr>\<xi>\<rparr> q' \<and> \<X> p' q'))\<close>}
       A relation \<^term>\<open>\<X>\<close> for which \<^term>\<open>sim \<X>\<close> holds is called a \<^emph>\<open>simulation relation\<close>.
 
-    \<^enum> We define the predicate \<^const>\<open>bisim\<close> on binary relations between process as
+    \<^enum> We define the predicate \<^const>\<open>bisim\<close> on binary relations between processes as
       follows:\<^footnote>\<open>Note that \<open>_\<inverse>\<inverse>\<close> is Isabelle/HOL syntax for conversion of relations that are
       represented by binary boolean functions.\<close>@{lemma [display, source]
       "bisim \<X> \<longleftrightarrow> sim \<X> \<and> sim \<X>\<inverse>\<inverse>"
@@ -407,8 +406,8 @@ text \<open>
       \<open>(\<sim>) = (GREATEST \<X>. bisim \<X>)\<close>
       by (fact bisimilarity_is_greatest_bisimulation)}
 
-  The above definition of \<^term>\<open>sim\<close> assumes each transition has exactly one target process and it
-  refers to labels and target processes separately. This is a problem in the presence of scope
+  The above definition of \<^term>\<open>sim\<close> refers to labels and target processes separately and assumes
+  each transition has exactly one target process. This is a problem in the presence of scope
   opening, where labels and target processes have to be considered together and where a single
   transition may have different target processes depending on published channels.
 \<close>
@@ -421,9 +420,9 @@ text \<open>
   to deal with the peculiarities of opening residuals. First, we define an operation
   \<^const>\<open>basic_lift\<close> that turns a relation between processes into a relation between basic
   residuals. The general idea is that \<^term>\<open>basic_lift \<X>\<close> relates two residuals if and only if their
-  labels are the same and their target process are in relation~\<^term>\<open>\<X>\<close>. This idea can be tweaked in
-  an obvious way to work with opening residuals. We define \<^const>\<open>basic_lift\<close> inductively using the
-  following two rules:
+  labels are the same and their target processes are in relation~\<^term>\<open>\<X>\<close>. This idea can be tweaked
+  in an obvious way to work with opening residuals. We define \<^const>\<open>basic_lift\<close> inductively using
+  the following rules:
 
     \<^item> Acting case:@{lemma [display]
       \<open>\<X> p q \<Longrightarrow> basic_lift \<X> (\<lbrace>\<alpha>\<rbrace> p) (\<lbrace>\<alpha>\<rbrace> q)\<close>
@@ -472,9 +471,9 @@ subsection \<open>Residuals in General\<close>
 context %invisible residual begin
 
 text \<open>
-  As indicated in Subsection~\ref{behavioral-equivalence}, a lifting operation \<^term>\<open>lift\<close> should
+  As indicated in Subsect.~\ref{behavioral-equivalence}, a lifting operation \<^term>\<open>lift\<close> should
   generally behave such that \<^term>\<open>lift \<X>\<close> relates two residuals if and only if their labels are the
-  same and their target process are in relation~\<^term>\<open>\<X>\<close>. The axioms for lifting operations should
+  same and their target processes are in relation~\<^term>\<open>\<X>\<close>. The axioms for lifting operations should
   be in line with this behavior and should at the same time be specific enough to allow us to
   develop the theory of bisimilarity solely based on a lifting operation parameter. It turns out
   that the following axioms fulfill these requirements:\<^footnote>\<open>Note that \<open>_ OO _\<close> is Isabelle/HOL syntax
@@ -501,7 +500,7 @@ text \<open>
   yields Haskell's functor axioms.\<close>
 
   With the additional conversion preservation axiom, the axioms for lifting operations are precisely
-  the axioms for \<^emph>\<open>relators\<close>~@{cite \<open>Section~5.1\<close> "bird:aop"}. Therefore, we can say that a residual
+  the axioms for \<^emph>\<open>relators\<close>~@{cite \<open>Sect.~5.1\<close> "bird:aop"}. Therefore, we can say that a residual
   structure is just an endorelator on the category of types and relations -- no problem here.
   Luckily, Isabelle/HOL automatically generates relator-specific constructs for every data type,
   namely the lifting operation and various facts about it, including the instances of the axioms. As
@@ -600,13 +599,13 @@ qed
 text \<open>
   Our axiomatic treatment of lifting operations allows us to handle ordinary bisimilarity, which is
   also known as \<^emph>\<open>strong bisimilarity\<close>. In practice, however, we are more interested in \<^emph>\<open>weak
-  bisimilarity\<close>. Weak bisimilarity cares only about \<^emph>\<open>observable\<close> behavior; it treats internal
+  bisimilarity\<close>. Weak bisimilarity cares only about observable behavior; it treats internal
   communication as silent and ignores it.
 
   Normally, weak bisimilarity can be elegantly defined as the bisimilarity of the \<^emph>\<open>weak transition
   relation\<close>~\<open>(\<Rightarrow>)\<close>, which is derived from the original transition relation~\<open>(\<rightarrow>)\<close> using the
   following equivalences:\<^footnote>\<open>The notation \<open>_ \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* _\<close> stands for the reflexive and transitive closure
-  of \<open>_ \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* _\<close>.\<close>
+  of \<open>_ \<rightarrow>\<lparr>\<tau>\<rparr> _\<close>.\<close>
 
     \<^item> Silent:@{lemma [display, source]
       "p \<Rightarrow>\<lparr>\<tau>\<rparr> q \<longleftrightarrow> p \<rightarrow>\<lparr>\<tau>\<rparr>\<^sup>*\<^sup>* q"
@@ -764,11 +763,10 @@ text \<open>
   Therefore, we can say that a weak residual structure is just a monad in the category of types and
   relations -- a completely unproblematic specification.
 
-  The monadic approach to weak residuals is actually very general. It does not only allow for a
-  common treatment of residuals with different scope opening patters but also makes non-standard
-  notions of silence possible, for example, by allowing multiple silent labels. Despite this
-  generality, typical properties of weak bisimilarity can be proved generically. Concretely, we have
-  developed formal proofs of the following statements:
+  The monadic approach to weak residuals is actually very general. In particular, it makes
+  non-standard notions of silence possible, for example, by allowing multiple silent labels. Despite
+  this generality, typical properties of weak bisimilarity can be proved generically. Concretely, we
+  have developed formal proofs of the following statements:
 
     \<^item> Weak bisimilarity is the same as ``mixed'' bisimilarity, a notion of bisimilarity where
       ordinary transitions are simulated by weak transitions.
@@ -869,13 +867,12 @@ text \<open>
   general-purpose process calculus embedded into functional host languages using HOAS. Since the
   operational semantics of the \<open>\<natural>\<close>-calculus is defined using two transition systems, we have
   developed an abstract theory of transition systems to treat concepts like bisimilarity
-  generically. We have formalized large parts of the \<open>\<natural>\<close>-calculus and our complete theory of
-  transition systems in Isabelle/HOL~@{cite "jeltsch:ouroboros-formalization"}.
+  generically. We have formalized~@{cite "jeltsch:ouroboros-formalization"} large parts of the
+  \<open>\<natural>\<close>-calculus and our complete theory of transition systems in Isabelle/HOL.
 
-  As it stands, the \<open>\<natural>\<close>-calculus allows process structure to depend on channels, which is something
-  we would like to avoid. Thus an important task for the future is the development of techniques
-  that allows us to prevent channel-dependent behavior while continuing to use HOAS for expressing
-  binding of names.
+  Because of our use of HOAS, the \<open>\<natural>\<close>-calculus allows process structure to depend on channels. An
+  important task for the future is the development of techniques that allow us to prevent
+  channel-dependent behavior while continuing to use HOAS for expressing binding of names.
 
   We plan to very soon start using our process calculus for developing a formally verified
   implementation of the Ouroboros family of consensus protocols. Our hope is to gain valuable
@@ -890,9 +887,9 @@ text \<open>
   this work. Special thanks go to Javier D\'iaz for stress-testing the \<open>\<natural>\<close>-calculus in his proofs
   of network equivalences, pointing me to some important related work, and proofreading this paper.
   Furthermore, I want to particularly thank Duncan Coutts and Philipp Kant for providing guidance
-  and feedback concerning our efforts towards a verified implementation of the Ouroboros consensus
-  protocols as well as Edsko de Vries for his help with process calculi and in particular for
-  putting us on the HOAS path.
+  and feedback concerning our efforts towards a verified implementation of the Ouroboros family of
+  consensus protocols as well as Edsko de Vries for his help with process calculi and in particular
+  for putting me on the HOAS path.
 \<close>
 
 end %invisible
