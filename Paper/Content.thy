@@ -841,7 +841,7 @@ text \<open>
   this approach for our formalization, since the classical nature of Isabelle/HOL makes exotic terms
   possible even if the channel type is abstract.
 
-  Röckl and Hirschkoff~@{cite "roeckel:jfp-13-2"} develop a HOAS-based implementation of the
+  R\"ockl and Hirschkoff~@{cite "roeckel:jfp-13-2"} develop a HOAS-based implementation of the
   language of the $\pi$-calculus in Isabelle/HOL and show that it is adequate with respect to an
   ordinary, first-order implementation. They prove several syntactic properties but do not deal with
   transitions and bisimilarity at all. Their definition of processes includes exotic terms, but they
